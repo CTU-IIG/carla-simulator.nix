@@ -1,0 +1,8 @@
+--- a/RecastBuilder/CMakeLists.txt
++++ b/RecastBuilder/CMakeLists.txt
+@@ -27,5 +27,3 @@
+ install(TARGETS RecastBuilder
+         RUNTIME DESTINATION bin
+         BUNDLE DESTINATION bin)
+-
+-install(TARGETS RecastBuilder DESTINATION ../../Util/DockerUtils/dist)
