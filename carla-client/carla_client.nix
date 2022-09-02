@@ -32,5 +32,11 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out/lib
     cp client/libcarla_client.a $out/lib
+    mkdir -p $out/include/carla
+    pushd ../source/carla
+    cp *.h $out/include/carla
+    cp --parents */*.h $out/include/carla
+    cp --parents */*/*.h $out/include/carla
+    popd
   '';
 }
