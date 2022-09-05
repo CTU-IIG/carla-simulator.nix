@@ -7,7 +7,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "carla_client";
+  pname = "carla-client";
   version = "0.9.12";
 
   src = fetchFromGitHub {

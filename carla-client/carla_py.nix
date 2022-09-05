@@ -11,14 +11,14 @@
 , networkx
 , distro
 , setuptools
-, carla_client
+, carla-client
 , rpclib
 , recast
 , osm2odr
 }:
 
 buildPythonPackage rec {
-  pname = "carla_py";
+  pname = "carla-py";
   version = "0.9.12";
 
   src = fetchFromGitHub {
@@ -28,7 +28,7 @@ buildPythonPackage rec {
     sha256 = "sha256-DdZQ3TWVg1UcGlp/YN9jThIDltUwa4LGIrLKYase+tQ=";
   };
 
-  buildInputs = [ distro carla_client boost rpclib recast osm2odr libpng.dev libjpeg.dev libtiff.dev proj.dev sqlite.dev xercesc networkx ];
+  buildInputs = [ distro carla-client boost rpclib recast osm2odr libpng.dev libjpeg.dev libtiff.dev proj.dev sqlite.dev xercesc networkx ];
   propagatedBuildInputs = [ numpy ];
   sourceRoot = "source/PythonAPI/carla";
   patches = [ ./carla_py.patch ];
