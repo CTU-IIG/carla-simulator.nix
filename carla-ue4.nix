@@ -54,7 +54,11 @@ stdenv.mkDerivation rec {
     mkdir -p .git
     ln -s ${linkedDeps}/.git/ue4-gitdeps  .git/ue4-gitdeps
     mkdir -p .git/ue4-sdks
-    ln -s ${ue4-sdk-clang} .git/ue4-sdks/${toolchainArchive}
+    #ln -s ${ue4-sdk-clang} .git/ue4-sdks/${toolchainArchive}
+
+    substituteInPlace Engine/Build/BatchFiles/Linux/Build.sh \
+            --replace 'mono Engine/Binaries/DotNET/UnrealBuildTool.exe "$@"' \
+                      'mono Engine/Binaries/DotNET/UnrealBuildTool.exe -ForceUseSystemCompiler "$@"'
 
     # Sometimes mono segfaults and things start downloading instead of being
     # deterministic. Let's just fail in that case.
