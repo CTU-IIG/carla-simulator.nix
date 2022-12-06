@@ -21,8 +21,6 @@ export -f process_dep
 
 go() {
     file="$1"
-
-    IFS=$'\n'
     perl -n -e '/(<Pack .*\/>)/ && print "$1\n"' $file | parallel -j20 --keep-order --verbose process_dep "{}"
 }
 
@@ -34,7 +32,6 @@ cat <<EOF
 EOF
 
 go Engine/Build/Commit.gitdeps.xml
-go Engine/Build/Promoted.gitdeps.xml
 
 cat <<EOF
 }
