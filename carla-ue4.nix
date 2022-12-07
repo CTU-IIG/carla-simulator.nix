@@ -83,32 +83,7 @@ let
     '';
 
     installPhase = ''
-      mkdir -p $out/bin $out/share/UnrealEngine
-
-      sharedir="$out/share/UnrealEngine"
-
-      cat << EOF > $out/bin/UE4Editor
-      #! $SHELL -e
-
-      sharedir="$sharedir"
-
-      # Can't include spaces, so can't piggy-back off the other Unreal directory.
-      workdir="\$HOME/.config/unreal-engine-nix-workdir"
-      if [ ! -e "\$workdir" ]; then
-        mkdir -p "\$workdir"
-        ${xorg.lndir}/bin/lndir "\$sharedir" "\$workdir"
-        unlink "\$workdir/Engine/Binaries/Linux/UE4Editor"
-        cp "\$sharedir/Engine/Binaries/Linux/UE4Editor" "\$workdir/Engine/Binaries/Linux/UE4Editor"
-      fi
-
-      cd "\$workdir/Engine/Binaries/Linux"
-      export PATH="${xdg-user-dirs}/bin\''${PATH:+:}\$PATH"
-      export LD_LIBRARY_PATH="${libPath}\''${LD_LIBRARY_PATH:+:}\$LD_LIBRARY_PATH"
-      exec ./UE4Editor "\$@"
-      EOF
-      chmod +x $out/bin/UE4Editor
-
-      rm -rf .git  # Don't have the linked deps in the resulting closure
+      rm -rf .git  # Attempt to not have the linked deps in the resulting closure
     '';
 
     buildInputs = [ mono which xdg-user-dirs zlib udev ];
@@ -135,5 +110,35 @@ let
     builder = "${fhsWrapper}/bin/${fhsWrapper.name}";
     args = [old.builder] ++ old.args;
   });
+  carlaUe4InFHS = runInFHSUserEnv carlaUe4 {};
 in
-runInFHSUserEnv carla-ue4 {}
+stdenv.mkDerivation rec {
+  name = "${carlaUe4InFHS.name}-wrapper";
+  dontUnpack = true;
+  installPhase = ''
+      mkdir -p $out/bin
+
+      sharedir="${carlaUe4InFHS}/share/UnrealEngine-${carlaUe4InFHS.version}"
+
+      cat << EOF > $out/bin/UE4Editor
+      #! $SHELL -e
+
+      sharedir="$sharedir"
+
+      # Can't include spaces, so can't piggy-back off the other Unreal directory.
+      workdir="\$HOME/.config/unreal-engine-nix-workdir"
+      if [ ! -e "\$workdir" ]; then
+        mkdir -p "\$workdir"
+        ${xorg.lndir}/bin/lndir "\$sharedir" "\$workdir"
+        unlink "\$workdir/Engine/Binaries/Linux/UE4Editor"
+        cp "\$sharedir/Engine/Binaries/Linux/UE4Editor" "\$workdir/Engine/Binaries/Linux/UE4Editor"
+      fi
+
+      cd "\$workdir/Engine/Binaries/Linux"
+      export PATH="${xdg-user-dirs}/bin\''${PATH:+:}\$PATH"
+      export LD_LIBRARY_PATH="${libPath}\''${LD_LIBRARY_PATH:+:}\$LD_LIBRARY_PATH"
+      exec ./UE4Editor "\$@"
+      EOF
+      chmod +x $out/bin/UE4Editor
+  '';
+}
