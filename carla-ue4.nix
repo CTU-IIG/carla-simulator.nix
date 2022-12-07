@@ -42,8 +42,8 @@ let
 
     # Unpack and build in $out for generated files to contain the correct path
     unpackPhase = ''
-      mkdir -p $out/share/UnrealEngine
-      cd $out/share/UnrealEngine
+      mkdir -p $out/share
+      cd $out/share
       ${unzip}/bin/unzip $src
     '';
     postPatch = ''
