@@ -63,8 +63,6 @@ let
       mkdir -p .git/ue4-sdks
       ln -s ${ue4-sdk-clang} .git/ue4-sdks/${toolchainArchive}
 
-      # ln -s Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/${toolchainVersion}/x86_64-unknown-linux-gnu
-
       # Sometimes mono segfaults and things start downloading instead of being
       # deterministic. Let's just fail in that case.
       export http_proxy="nodownloads"
@@ -78,27 +76,10 @@ let
       export XDG_CONFIG_HOME=$(mktemp -d)
 
       # Override write attempts to /etc/mono/registry/LocalMachine
-      export MONO_REGISTRY_PATH=$out/etc/mono/registry/LocalMachine
-      mkdir -p "$MONO_REGISTRY_PATH"
+      export MONO_REGISTRY_PATH=$(mktemp -d)
 
       ./Setup.sh
-
-      # Patch binaries in the clang toolchain from ue4-sdk-clang. We link to
-      # Nix-provided libraries instead of the libraries from the toolchain,
-      # because the toolchains libraries cause clang to segfault. This means
-      # that autoPatchelf should not look into .../x86_64-unknown-linux-gnu/lib.
-      #autoPatchelf Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/${toolchainVersion}/x86_64-unknown-linux-gnu/bin/
-
-      # Remove the file that makes patchelf fail (assertion)
-      #rm Engine/Binaries/Linux/UnrealVersionSelector-Linux-Shipping.debug
-
-      #addAutoPatchelfSearchPath Engine/Binaries/ThirdParty/CEF3/Linux
-      #autoPatchelf Engine/Binaries/Linux
-
       ./GenerateProjectFiles.sh
-
-      # Patch newly generated binaries
-      #autoPatchelf Engine/Binaries/Linux
     '';
 
     installPhase = ''
