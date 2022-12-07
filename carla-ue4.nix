@@ -31,7 +31,7 @@ let
   };
 
   carla-ue4 = stdenv.mkDerivation rec {
-    pname = "carla-ue4";
+    pname = "ue4-carla";
     version = "0.9.13";
     sourceRoot = "UnrealEngine-${version}";
     src = requireFile {
@@ -39,7 +39,11 @@ let
       url = "https://github.com/CarlaUnreal/UnrealEngine/archive/refs/tags/${version}.zip";
       sha256 = "10q73ax9v44h6s5r0rjglg6x7iqjfbbcc58ssdssk4qq3lp63qp8";
     };
+
+    # Unpack and build in $out for generated files to contain the correct path
     unpackPhase = ''
+      mkdir -p $out/share/UnrealEngine
+      cd $out/share/UnrealEngine
       ${unzip}/bin/unzip $src
     '';
     postPatch = ''
@@ -50,15 +54,14 @@ let
 
     nativeBuildInputs = [ ];
 
+    # Do not use Mono bundled with UE
+    UE_USE_SYSTEM_MONO = 1;
+
     configurePhase = ''
       mkdir -p .git
       ln -s ${linkedDeps}/.git/ue4-gitdeps  .git/ue4-gitdeps
       mkdir -p .git/ue4-sdks
-      #ln -s ${ue4-sdk-clang} .git/ue4-sdks/${toolchainArchive}
-
-      substituteInPlace Engine/Build/BatchFiles/Linux/Build.sh \
-              --replace 'mono Engine/Binaries/DotNET/UnrealBuildTool.exe "$@"' \
-                        'mono Engine/Binaries/DotNET/UnrealBuildTool.exe -ForceUseSystemCompiler "$@"'
+      ln -s ${ue4-sdk-clang} .git/ue4-sdks/${toolchainArchive}
 
       # ln -s Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/${toolchainVersion}/x86_64-unknown-linux-gnu
 
@@ -98,9 +101,6 @@ let
       #autoPatchelf Engine/Binaries/Linux
     '';
 
-    # Do not use Mono bundled with UE
-    UE_USE_SYSTEM_MONO = 1;
-
     installPhase = ''
       mkdir -p $out/bin $out/share/UnrealEngine
 
@@ -127,7 +127,7 @@ let
       EOF
       chmod +x $out/bin/UE4Editor
 
-      cp -r . "$sharedir"
+      rm -rf .git  # Don't have the linked deps in the resulting closure
     '';
 
     buildInputs = [ mono which xdg-user-dirs zlib udev ];
