@@ -25,12 +25,12 @@ let
   # Values from Engine/Build/BatchFiles/Linux/SetupToolchain.sh
   toolchainVersion = "v17_clang-10.0.1-centos7";
   toolchainArchive = "${toolchainVersion}.tar.gz";
-  ue4-sdk-clang = fetchurl {
+  ue4SdkClang = fetchurl {
     url = "http://cdn.unrealengine.com/Toolchain_Linux/native-linux-${toolchainArchive}";
     sha256 = "sha256-3FvMikfcQrHyzt04ZQXpCgxU9T365EptetKebTiiOcA=";
   };
 
-  carla-ue4 = stdenv.mkDerivation rec {
+  carlaUe4 = stdenv.mkDerivation rec {
     pname = "ue4-carla";
     version = "0.9.13";
     sourceRoot = "UnrealEngine-${version}";
@@ -61,7 +61,7 @@ let
       mkdir -p .git
       ln -s ${linkedDeps}/.git/ue4-gitdeps  .git/ue4-gitdeps
       mkdir -p .git/ue4-sdks
-      ln -s ${ue4-sdk-clang} .git/ue4-sdks/${toolchainArchive}
+      ln -s ${ue4SdkClang} .git/ue4-sdks/${toolchainArchive}
 
       # Sometimes mono segfaults and things start downloading instead of being
       # deterministic. Let's just fail in that case.
