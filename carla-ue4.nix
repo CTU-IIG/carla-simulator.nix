@@ -117,6 +117,8 @@ stdenv.mkDerivation rec {
   dontUnpack = true;
   installPhase = ''
       mkdir -p $out/bin
+      mkdir -p $out/share
+      ln -s "${carlaUe4InFHS}/share/UnrealEngine-${carlaUe4InFHS.version}" $out/share
 
       sharedir="${carlaUe4InFHS}/share/UnrealEngine-${carlaUe4InFHS.version}"
 
@@ -136,7 +138,7 @@ stdenv.mkDerivation rec {
 
       cd "\$workdir/Engine/Binaries/Linux"
       export PATH="${xdg-user-dirs}/bin\''${PATH:+:}\$PATH"
-      export LD_LIBRARY_PATH="${libPath}\''${LD_LIBRARY_PATH:+:}\$LD_LIBRARY_PATH"
+      export LD_LIBRARY_PATH="${libPath}:\$sharedir/Engine/Binaries/Linux:\$sharedir/Engine/Binaries/ThirdParty/PhysX3/Linux/x86_64-unknown-linux-gnu\''${LD_LIBRARY_PATH:+:}\$LD_LIBRARY_PATH"
       exec ./UE4Editor "\$@"
       EOF
       chmod +x $out/bin/UE4Editor
