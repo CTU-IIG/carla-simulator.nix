@@ -1,5 +1,10 @@
 { lib, stdenv, writeScript, fetchurl, requireFile, unzip, mono, which,
-  xorg, xdg-user-dirs, zlib, udev, runCommand, buildFHSUserEnv
+  xorg, xdg-user-dirs, zlib, udev, runCommand, buildFHSUserEnv, autoPatchelfHook,
+  lzma,
+
+  alsa-lib, atk, bzip2, cairo, dbus, expat, fontconfig, freetype,
+  gnome2, gdbm, libglvnd, glib, ncurses5, nspr, nss_latest, readline,
+  sqlite, tcl-8_5, tk-8_5, libuuid
 }:
 
 let
@@ -115,12 +120,44 @@ in
 stdenv.mkDerivation rec {
   name = "${carlaUe4InFHS.name}-wrapper";
   dontUnpack = true;
+
+  nativeBuildInputs = [ autoPatchelfHook ];
+
+  autoPatchelfIgnoreMissingDeps = [
+    "libGLESv2.so"
+    "libOpenSLES.so"
+    "libandroid.so"
+    "liblog.so"
+    "libc++_shared.so"
+    "libcrypto.so.10"
+    "libffi.so.6"
+    "libgdbm.so.4"
+    "libgnustl_shared.so"
+    "libjnigraphics.so"
+    "libssl.so.10"
+    "usdSchemaExamples.so"
+  ];
+
+  buildInputs = [ zlib lzma alsa-lib atk bzip2 cairo dbus expat
+    fontconfig freetype gnome2.GConf gdbm libglvnd glib ncurses5 nspr
+    nss_latest gnome2.pango readline sqlite tcl-8_5 tk-8_5 libuuid
+
+    xorg.libX11 xorg.libXScrnSaver xorg.libXau xorg.libXcursor xorg.libXext
+    xorg.libXfixes xorg.libXi xorg.libXrandr xorg.libXrender xorg.libXxf86vm
+    xorg.libxcb xorg.libXcomposite xorg.libXdamage xorg.libXtst
+  ];
+
   installPhase = ''
       mkdir -p $out/bin
       mkdir -p $out/share
-      ln -s "${carlaUe4InFHS}/share/UnrealEngine-${carlaUe4InFHS.version}" $out/share
+      #ln -s "${carlaUe4InFHS}/share/UnrealEngine-${carlaUe4InFHS.version}" $out/share
+      cp -a "${carlaUe4InFHS}/share/UnrealEngine-${carlaUe4InFHS.version}" $out/share
 
-      sharedir="${carlaUe4InFHS}/share/UnrealEngine-${carlaUe4InFHS.version}"
+      # Remove files which break patchelf
+      chmod +w $out/share/UnrealEngine-${carlaUe4InFHS.version}/Engine/Binaries/Linux
+      rm $out/share/UnrealEngine-${carlaUe4InFHS.version}/Engine/Binaries/Linux/*.debug
+
+      sharedir="$out/share/UnrealEngine-${carlaUe4InFHS.version}"
 
       cat << EOF > $out/bin/UE4Editor
       #! $SHELL -e
