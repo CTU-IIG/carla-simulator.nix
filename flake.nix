@@ -17,5 +17,6 @@
         recast = pkgs.callPackage carla-client/recast.nix {};
         rpclib = pkgs.callPackage carla-client/rpclib.nix {};
       };
+      devShells.x86_64-linux.default = import ./build-env/shell.nix { inherit pkgs; };
     };
 }
