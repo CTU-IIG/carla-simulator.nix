@@ -1,6 +1,6 @@
 # Nix expressions for Carla simulator
 
-This is a work-ip-progress. The interface can change any time.
+This is a work-in-progress. The interface can change any time.
 
 Currently, it's possible to build the Carla client library and its
 Python bindings:
