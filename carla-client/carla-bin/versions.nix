@@ -5,7 +5,7 @@ let
     exec ${carla}/CarlaUE4.sh "$@"
   '';
   wrap-carla = {...}@args:
-    let carla = pkgs.callPackage (import ./carla.nix {
+    let carla = pkgs.callPackage (import ./common.nix {
           inherit (args) version src-hash;
         }) {};
     in
@@ -18,5 +18,9 @@ in {
   "0.9.13" = wrap-carla {
       version = "0.9.13";
       src-hash = "aac2147197d69fa76abc3c74f9db3e293ceb5e031b795eba509e26d954d6e97d";
+    };
+  "0.9.14" = wrap-carla {
+      version = "0.9.14";
+      src-hash = "sha256-3SBze9jhpSL0D6EbHPMBSk3viRTFQddN84j2AiBrQlI=";
     };
 }
