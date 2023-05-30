@@ -42,7 +42,10 @@ python3Packages.buildPythonPackage rec {
     xercesc
   ];
 
-  propagatedBuildInputs = [ python3Packages.numpy ];
+  propagatedBuildInputs = [
+    python3Packages.numpy
+    python3Packages.shapely
+  ];
   sourceRoot = "source/PythonAPI/carla";
   patches = [
     ./0001-Allow-compiling-with-Nix.patch
