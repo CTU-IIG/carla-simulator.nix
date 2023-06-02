@@ -1,5 +1,3 @@
-{ version, src-hash }:
-
 { python3Packages
 , fetchFromGitHub
 , libpng
@@ -12,18 +10,14 @@
 , rpclib
 , recast
 , osm2odr
+, carla-src
 }:
 
 python3Packages.buildPythonPackage rec {
   pname = "carla-py";
-  inherit version;
+  version = carla-src.meta.version;
 
-  src = fetchFromGitHub {
-    owner = "carla-simulator";
-    repo = "carla";
-    rev = version;
-    sha256 = src-hash;
-  };
+  src = carla-src;
 
   buildInputs = [
     carla-client

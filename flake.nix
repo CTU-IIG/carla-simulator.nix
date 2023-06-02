@@ -12,8 +12,9 @@
       overlays = let
         overlayForVersion = version: final: prev: {
           #carla-bin = builtins.getAttr version (import ./carla-bin/versions.nix { pkgs = final; });
-          carla-client = prev.callPackage (builtins.getAttr version (import carla-client/carla-client/versions.nix)) {};
-          carla-py = prev.python3.pkgs.callPackage (builtins.getAttr version (import carla-client/carla-py/versions.nix)) {};
+          carla-src = prev.callPackage (builtins.getAttr version (import ./carla-src/versions.nix)) {};
+          carla-client = prev.callPackage carla-client/carla-client {};
+          carla-py = prev.python3.pkgs.callPackage carla-client/carla-py {};
           osm2odr = prev.callPackage carla-client/osm2odr.nix {};
           recast = prev.callPackage carla-client/recastnavigation {};
           rpclib = prev.callPackage carla-client/rpclib.nix {};

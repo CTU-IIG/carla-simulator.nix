@@ -1,23 +1,17 @@
-{ version, src-hash }:
-
 { stdenv
 , cmake
 , boost
 , rpclib
 , recast
 , fetchFromGitHub
+, carla-src
 }:
 
 stdenv.mkDerivation rec {
   pname = "carla-client";
-  inherit version;
+  version = carla-src.meta.version;
 
-  src = fetchFromGitHub {
-    owner = "carla-simulator";
-    repo = "carla";
-    rev = version;
-    sha256 = src-hash;
-  };
+  src = carla-src;
 
   nativeBuildInputs = [ cmake ];
   buildInputs = [ boost rpclib recast ];
