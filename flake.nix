@@ -34,7 +34,23 @@
         carla-bin_0_9_14 = carla-bin-versions."0.9.14";
       } // # Add also all packages from our overlay
       (builtins.intersectAttrs packagesInOverlay (pkgs.extend self.overlays."0.9.14"));
-      devShells.x86_64-linux.default = import ./build-env/shell.nix { inherit pkgs; };
+      devShells.x86_64-linux = {
+        # Attempt to have a shell where one can build CARLA
+        default = import ./build-env/shell.nix { inherit pkgs; };
+        # A shell for running CARLA PythonAPI examples
+        carla-py = pkgs.mkShell {
+          name = "Shell for running CARLA PythonAPI examples";
+          packages = [
+            (pkgs.python3.withPackages(p: [
+              (pkgs.extend self.overlays."0.9.14").carla-py
+              p.pygame
+              p.transforms3d
+              p.opencv4
+              p.networkx
+            ]))
+          ];
+        };
+      };
       checks.x86_64-linux.ci = let
         pkgsFromOverlay = version: pkgs.lib.attrsets.mapAttrs' (n: v: pkgs.lib.nameValuePair "${n}-${version}" v)
           (builtins.intersectAttrs packagesInOverlay (pkgs.extend (builtins.getAttr version self.overlays)));
