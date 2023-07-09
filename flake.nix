@@ -18,6 +18,7 @@
           osm2odr = prev.callPackage carla-client/osm2odr.nix {};
           recast = prev.callPackage carla-client/recastnavigation {};
           rpclib = prev.callPackage carla-client/rpclib.nix {};
+          scenic = prev.callPackage ./scenic {};
         };
       in {
         "0.9.12" = overlayForVersion "0.9.12";
