@@ -20,6 +20,7 @@
           rpclib = prev.callPackage carla-client/rpclib.nix {};
           opencv-python = prev.callPackage ./opencv-python {};
           scenic = prev.callPackage ./scenic {};
+          scenario-runner = prev.callPackage ./scenario-runner {};
         };
       in {
         "0.9.12" = overlayForVersion "0.9.12";

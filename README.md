@@ -27,9 +27,11 @@ git+file:///home/wsh/src/carla/nix
         ├───carla-client: package 'carla-client-0.9.14'
         ├───carla-py: package 'python3.10-carla-py-0.9.14'
         ├───carla-src: package 'source'
+        ├───opencv-python: package 'python3.10-opencv-python-4.8.0.74'
         ├───osm2odr: package 'osm2odr-0.pre+date=2022-08-30'
         ├───recast: package 'recast-0.pre+date=2022-08-30'
         ├───rpclib: package 'rpclib-0.pre+date=2022-08-30'
+        ├───scenario-runner: package 'python3.10-scenario-runner-0.9.13'
         ├───scenic: package 'python3.10-scenic-2.1.0'
         └───ue4: package 'ue4-carla-0.9.13-wrapper'
 ```
