@@ -1,5 +1,5 @@
 { python3Packages
-, fetchFromGitHub
+, python3
 , libpng
 , libjpeg
 , libtiff
@@ -40,6 +40,11 @@ python3Packages.buildPythonPackage rec {
     python3Packages.numpy
     python3Packages.shapely
   ];
+
+  postInstall = ''
+    cp -r $src/PythonAPI/carla/agents $out/${python3.sitePackages}
+  '';
+
   sourceRoot = "source/PythonAPI/carla";
   patches = [
     ./0001-Allow-compiling-with-Nix.patch
