@@ -63,6 +63,9 @@ python3Packages.buildPythonPackage rec {
     matplotlib
     six
     simple-watchdog-timer
+
+    # for manual_control.py
+    pygame
   ]) ++ [
     # Other
     carla-py
@@ -76,6 +79,7 @@ python3Packages.buildPythonPackage rec {
 
     mkdir -p $out/bin
     cp $src/scenario_runner.py $out/bin
+    cp $src/manual_control.py $out/bin/scenario_runner_manual_control.py
   '';
 
   makeWrapperArgs = [
