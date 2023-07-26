@@ -84,6 +84,6 @@ python3Packages.buildPythonPackage rec {
 
   makeWrapperArgs = [
     "--prefix PYTHONPATH : ''$out/${python3.sitePackages}"
-    "--set SCENARIO_RUNNER_ROOT $out/${python3.sitePackages}"
+    "--set-default SCENARIO_RUNNER_ROOT $out/${python3.sitePackages}"
   ];
 }
