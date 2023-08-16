@@ -18,6 +18,9 @@ python3Packages.buildPythonPackage rec {
   version = carla-src.meta.version;
 
   src = carla-src;
+  sourceRoot = "source/PythonAPI/carla";
+#   src = /home/wsh/src/carla/carla;
+#   sourceRoot = "carla/PythonAPI/carla";
 
   separateDebugInfo = true;
 
@@ -47,7 +50,6 @@ python3Packages.buildPythonPackage rec {
     cp -r $src/PythonAPI/carla/agents $out/${python3.sitePackages}
   '';
 
-  sourceRoot = "source/PythonAPI/carla";
   patches = [
     ./0001-Allow-compiling-with-Nix.patch
     ./0002-Don-t-fail-when-compiling-with-gcc-12.patch
