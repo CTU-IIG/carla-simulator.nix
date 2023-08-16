@@ -51,5 +51,6 @@ python3Packages.buildPythonPackage rec {
   patches = [
     ./0001-Allow-compiling-with-Nix.patch
     ./0002-Don-t-fail-when-compiling-with-gcc-12.patch
+    ./0003-PythonAPI-Fix-segfault-in-GetAvailableMaps.patch
   ];
 }

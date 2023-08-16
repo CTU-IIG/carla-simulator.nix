@@ -1,0 +1,61 @@
+From b998e1fb66aa55c078d536f9d10bebf648a129d1 Mon Sep 17 00:00:00 2001
+From: Michal Sojka <michal.sojka@cvut.cz>
+Date: Wed, 16 Aug 2023 21:16:36 +0200
+Subject: [PATCH] PythonAPI: Fix segfault in GetAvailableMaps
+
+When using CARLA with Python 3.10, I'm getting a segfault in
+GetAvailableMaps. The problem disappears when PyList manipulation does
+not happen with GIL unlocked, as done in this commit.
+
+The initial part of crash backtrace (from GDB) is below:
+
+    Program terminated with signal SIGSEGV, Segmentation fault.
+
+    warning: Section `.reg-xstate/49253' in core file too small.
+    #0  _PyInterpreterState_GET () at ./Include/internal/pycore_pystate.h:117
+    117	   return tstate->interp;
+    [Current thread is 1 (Thread 0x7fe6fe48f740 (LWP 49253))]
+    (gdb) bt
+    #0  _PyInterpreterState_GET () at ./Include/internal/pycore_pystate.h:117
+    #1  get_list_state () at Objects/listobject.c:26
+    #2  PyList_New (size=0) at Objects/listobject.c:159
+    #3  0x00007fe6fdc0dab0 in boost::python::detail::list_base::list_base() () from /nix/store/c95f3nrkz3sflvycihyw1c8q4nk47p4m-boost-1.79.0/lib/libboost_python310.so.1.79.0
+    #4  0x00007fe6ef9ecfc4 in boost::python::list::list (this=0x7ffd8a8aae28) at include/boost/python/list.hpp:61
+    #5  GetAvailableMaps (self=...) at source/libcarla/Client.cpp:26
+    #6  0x00007fe6efb6a8fe in boost::python::detail::invoke<boost::python::to_python_value<boost::python::list const&>, boost::python::list (*)(carla::client::Client const&), boost::python::arg_from_python<carla::client::Client const&> > (rc=..., f=<optimized out>, ac0=...)
+        at include/boost/python/detail/invoke.hpp:73
+    #7  boost::python::detail::caller_arity<1u>::impl<boost::python::list (*)(carla::client::Client const&), boost::python::default_call_policies, boost::mpl::vector2<boost::python::list, carla::client::Client const&> >::operator() (args_=<optimized out>, this=<optimized out>)
+        at include/boost/python/detail/caller.hpp:233
+    #8  boost::python::objects::caller_py_function_impl<boost::python::detail::caller<boost::python::list (*)(carla::client::Client const&), boost::python::default_call_policies, boost::mpl::vector2<boost::python::list, carla::client::Client const&> > >::operator() (
+        this=<optimized out>, args=<optimized out>, kw=<optimized out>) at include/boost/python/object/py_function.hpp:38
+    #9  0x00007fe6fdc1b4dd in boost::python::objects::function::call(_object*, _object*) const () from /nix/store/c95f3nrkz3sflvycihyw1c8q4nk47p4m-boost-1.79.0/lib/libboost_python310.so.1.79.0
+    #10 0x00007fe6fdc1b6a8 in boost::detail::function::void_function_ref_invoker0<boost::python::objects::(anonymous namespace)::bind_return, void>::invoke(boost::detail::function::function_buffer&) ()
+       from /nix/store/c95f3nrkz3sflvycihyw1c8q4nk47p4m-boost-1.79.0/lib/libboost_python310.so.1.79.0
+    ...
+---
+ source/libcarla/Client.cpp | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/source/libcarla/Client.cpp b/source/libcarla/Client.cpp
+index 748e2c5ad..7c0b8e341 100644
+--- a/source/libcarla/Client.cpp
++++ b/source/libcarla/Client.cpp
+@@ -22,9 +22,13 @@ static void SetTimeout(carla::client::Client &client, double seconds) {
+ }
+ 
+ static auto GetAvailableMaps(const carla::client::Client &self) {
+-  carla::PythonUtil::ReleaseGIL unlock;
+   boost::python::list result;
+-  for (const auto &str : self.GetAvailableMaps()) {
++  std::vector<std::string> maps;
++  {
++    carla::PythonUtil::ReleaseGIL unlock;
++    maps = self.GetAvailableMaps();
++  }
++  for (const auto &str : maps) {
+     result.append(str);
+   }
+   return result;
+-- 
+2.40.1
+
