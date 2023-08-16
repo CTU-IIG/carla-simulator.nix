@@ -5,24 +5,23 @@
 
 stdenv.mkDerivation {
   pname = "recast";
-  version = "0.pre+date=2022-08-30";
+  version = "0.pre+date=2023-02-21";
 
   src = fetchFromGitHub {
     owner = "carla-simulator";
     repo = "recastnavigation";
-    rev = "0b13b0d288ac96fdc5347ee38299511c6e9400db";
-    sha256 = "sha256-AoN7GF6i0+AvwtxyUlda8mzleDGXbemimJAkLdxArWQ=";
+    rev = "22dfcb46204df1a07f696ae3d9efc76f718ea531";
+    sha256 = "sha256-9UCIXcWV8OJp+Gr/xOmRCTk+mBRWU5rbveGmukm+4rc=";
   };
 
   nativeBuildInputs = [ cmake ];
-  patches = [ ./recast.patch ];
+  patches = [
+    ./recast.patch
+    ./0001-nix-Install-path-fixes.patch
+  ];
 
   cmakeFlags = [
     "-DRECASTNAVIGATION_DEMO=False"
     "-DRECASTNAVIGATION_TEST=False"
   ];
-  postInstall = ''
-    mkdir -p $out/include/recast
-    mv $out/include/*.h $out/include/recast/
-  '';
 }

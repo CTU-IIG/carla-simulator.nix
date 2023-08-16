@@ -2,8 +2,10 @@
   description = "Carla simulator";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+  inputs.carla-dev = { url = "github:carla-simulator/carla/dev"; flake = false; };
+  #inputs.carla-dev = { url = "git+file:///home/wsh/src/carla/carla"; flake = false; };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, carla-dev }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
       carla-bin-versions = import ./carla-bin/versions.nix { inherit pkgs; };
@@ -12,7 +14,9 @@
       overlays = let
         overlayForVersion = version: final: prev: {
           #carla-bin = builtins.getAttr version (import ./carla-bin/versions.nix { pkgs = final; });
-          carla-src = prev.callPackage (builtins.getAttr version (import ./carla-src/versions.nix)) {};
+          carla-src = if version == "dev"
+                      then carla-dev // { meta.version = "dev-${carla-dev.shortRev}"; }
+                      else prev.callPackage (builtins.getAttr version (import ./carla-src/versions.nix)) {};
           carla-client = prev.callPackage carla-client/carla-client {};
           carla-py = prev.python3.pkgs.callPackage carla-client/carla-py {};
           osm2odr = prev.callPackage carla-client/osm2odr.nix {};
@@ -26,6 +30,7 @@
         "0.9.12" = overlayForVersion "0.9.12";
         "0.9.13" = overlayForVersion "0.9.13";
         "0.9.14" = overlayForVersion "0.9.14";
+        "dev" = overlayForVersion "dev";
       };
       packages.x86_64-linux = {
         # Packages that we provide since beginning (backward compatibility)
@@ -35,7 +40,7 @@
         carla-bin_0_9_13 = carla-bin-versions."0.9.13";
         carla-bin_0_9_14 = carla-bin-versions."0.9.14";
       } // # Add also all packages from our overlay
-      (builtins.intersectAttrs packagesInOverlay (pkgs.extend self.overlays."0.9.14"));
+      (builtins.intersectAttrs packagesInOverlay (pkgs.extend self.overlays.dev));
       devShells.x86_64-linux = {
         # Attempt to have a shell where one can build CARLA
         default = import ./build-env/shell.nix { inherit pkgs; };

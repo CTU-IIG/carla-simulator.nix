@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "carla-dev": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1689100834,
+        "narHash": "sha256-5CkMRn01FaTY5ag+xzHtw52g5fcMzbZxCXw0PiYjaw8=",
+        "owner": "carla-simulator",
+        "repo": "carla",
+        "rev": "bc719a1056494b3fbd0198362cb5a02353534c11",
+        "type": "github"
+      },
+      "original": {
+        "owner": "carla-simulator",
+        "ref": "dev",
+        "repo": "carla",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1688868408,
@@ -18,6 +35,7 @@
     },
     "root": {
       "inputs": {
+        "carla-dev": "carla-dev",
         "nixpkgs": "nixpkgs"
       }
     }
