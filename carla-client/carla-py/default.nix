@@ -19,6 +19,8 @@ python3Packages.buildPythonPackage rec {
 
   src = carla-src;
 
+  separateDebugInfo = true;
+
   buildInputs = [
     carla-client
     libjpeg.dev
