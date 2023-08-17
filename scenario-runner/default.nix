@@ -88,5 +88,12 @@ python3Packages.buildPythonPackage rec {
   makeWrapperArgs = [
     "--prefix PYTHONPATH : ''$out/${python3.sitePackages}"
     "--set-default SCENARIO_RUNNER_ROOT $out/${python3.sitePackages}"
-  ];
+  ] ++ (let
+    # This must be defined here due to nix escaping rules
+    carla-host-arg = ''''${CARLA_HOST:+--host $CARLA_HOST}'';
+    carla-port-arg = ''''${CARLA_PORT:+--port $CARLA_PORT}'';
+  in [
+    "--add-flags '${carla-host-arg}'"
+    "--add-flags '${carla-port-arg}'"
+  ]);
 }
