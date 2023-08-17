@@ -79,6 +79,9 @@ python3Packages.buildPythonPackage rec {
 
     mkdir -p $out/bin
     cp $src/scenario_runner.py $out/bin
+    cp $src/metrics_manager.py $out/bin/scenario_runner_metrics_manager.py
+    chmod +x $out/bin/scenario_runner_metrics_manager.py
+    cp $src/no_rendering_mode.py $out/bin/scenario_runner_no_rendering_mode.py
     cp $src/manual_control.py $out/bin/scenario_runner_manual_control.py
   '';
 
