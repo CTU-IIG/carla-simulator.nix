@@ -55,4 +55,8 @@ python3Packages.buildPythonPackage rec {
     ./0002-Don-t-fail-when-compiling-with-gcc-12.patch
     ./0003-PythonAPI-Fix-segfault-in-GetAvailableMaps.patch
   ];
+
+  passthru = {
+    inherit src; # for ./scripts.nix
+  };
 }

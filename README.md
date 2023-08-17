@@ -28,6 +28,7 @@ git+file:///home/wsh/src/carla/nix
         ├───carla-bin_0_9_14: package 'CarlaUE4.sh'
         ├───carla-client: package 'carla-client-0.9.14'
         ├───carla-py: package 'python3.10-carla-py-0.9.14'
+        ├───carla-py-scripts: package 'carla-py-scripts-0.9.14'
         ├───carla-src: package 'source'
         ├───opencv-python: package 'python3.10-opencv-python-4.8.0.74'
         ├───osm2odr: package 'osm2odr-0.pre+date=2022-08-30'
