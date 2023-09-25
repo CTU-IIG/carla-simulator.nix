@@ -1,0 +1,58 @@
+From 0a262e0986782a9cdf4ab40272af1d119de57a79 Mon Sep 17 00:00:00 2001
+From: Michal Sojka <michal.sojka@cvut.cz>
+Date: Mon, 25 Sep 2023 16:54:44 +0200
+Subject: [PATCH] PythonAPI: Fix segfault in
+ world.get_random_location_from_navigation()
+
+When I run generate_traffic.py under Python 3.10, I get a segfault at
+line:
+
+    loc = world.get_random_location_from_navigation()
+
+The backtrace from gdb looks like this:
+
+    #0  0x00007f04552ad7e7 in new_threadstate () from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/libpython3.10.so.1.0
+    #1  0x00007f04552adaa1 in PyGILState_Ensure () from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/libpython3.10.so.1.0
+    #2  0x00007f040afd4f32 in std::_Function_handler<void (carla::client::WorldSnapshot), MakeCallback(boost::python::api::object)::{lambda(auto:1)#1}>::_M_invoke(std::_Any_data const&, carla::client::WorldSnapshot&&) ()
+       from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/python3.10/site-packages/carla/libcarla.cpython-310-x86_64-linux-gnu.so
+    #3  0x00007f040b1d4ab1 in carla::client::detail::CallbackList<carla::client::WorldSnapshot>::Call(carla::client::WorldSnapshot) const () from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/python3.10/site-packages/carla/libcarla.cpython-310-x86_64-linux-gnu.so
+    #4  0x00007f040b1d424a in std::_Function_handler<void (carla::Buffer), carla::client::detail::Episode::Listen()::{lambda(auto:1)#1}>::_M_invoke(std::_Any_data const&, carla::Buffer&&) ()
+       from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/python3.10/site-packages/carla/libcarla.cpython-310-x86_64-linux-gnu.so
+    #5  0x00007f040b23fc41 in boost::asio::detail::completion_handler<boost::asio::detail::binder0<carla::streaming::detail::tcp::Client::ReadData()::{lambda()#1}::operator()() const::{lambda(boost::system::error_code, unsigned long)#1}::operator()(boost::system::error_code, unsigned long) const::{lambda()#1}>, boost::asio::io_context::basic_executor_type<std::allocator<void>, 0ul> >::do_complete(void*, boost::asio::detail::scheduler_operation*, boost::system::error_code const&, unsigned long) ()
+       from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/python3.10/site-packages/carla/libcarla.cpython-310-x86_64-linux-gnu.so
+    #6  0x00007f040b24ae85 in boost::asio::detail::strand_service::do_complete(void*, boost::asio::detail::scheduler_operation*, boost::system::error_code const&, unsigned long) ()
+       from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/python3.10/site-packages/carla/libcarla.cpython-310-x86_64-linux-gnu.so
+    #7  0x00007f040b1a94f5 in boost::asio::detail::scheduler::do_run_one(boost::asio::detail::conditionally_enabled_mutex::scoped_lock&, boost::asio::detail::scheduler_thread_info&, boost::system::error_code const&) ()
+       from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/python3.10/site-packages/carla/libcarla.cpython-310-x86_64-linux-gnu.so
+    #8  0x00007f040b199351 in boost::asio::detail::scheduler::run(boost::system::error_code&) [clone .isra.0] () from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/python3.10/site-packages/carla/libcarla.cpython-310-x86_64-linux-gnu.so
+    #9  0x00007f040b1ac1cb in std::thread::_State_impl<std::thread::_Invoker<std::tuple<carla::ThreadPool::AsyncRun(unsigned long)::{lambda()#1}> > >::_M_run() ()
+       from /nix/store/zqj9irpw63pal9r4671p1gjd9jiw5sid-ros-env/lib/python3.10/site-packages/carla/libcarla.cpython-310-x86_64-linux-gnu.so
+    #10 0x00007f040bce05c3 in execute_native_thread_routine () from /nix/store/2fpmbk0g0ggm9zq89af7phvvvv8dnm7n-gcc-12.3.0-lib/lib/libstdc++.so.6
+    #11 0x00007f045509fdd4 in start_thread () from /nix/store/1x4ijm9r1a88qk7zcmbbfza324gx1aac-glibc-2.37-8/lib/libc.so.6
+    #12 0x00007f04551219b0 in clone3 () from /nix/store/1x4ijm9r1a88qk7zcmbbfza324gx1aac-glibc-2.37-8/lib/libc.so.6
+
+It turns out that its caused by releasing GIL for too long. We fix it
+by releasing the GIL only for the actual libcarla call and
+constructing Python objects with GIL locked.
+---
+ source/libcarla/libcarla.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/source/libcarla/libcarla.cpp b/source/libcarla/libcarla.cpp
+index f56ea5c99..73998c2eb 100644
+--- a/source/libcarla/libcarla.cpp
++++ b/source/libcarla/libcarla.cpp
+@@ -139,8 +139,8 @@ std::vector<T> PythonLitstToVector(boost::python::list &input) {
+     }
+ 
+ #define CALL_RETURNING_OPTIONAL_WITHOUT_GIL(cls, fn) +[](const cls &self) { \
+-      carla::PythonUtil::ReleaseGIL unlock; \
+-      auto optional = self.fn(); \
++      auto call = CONST_CALL_WITHOUT_GIL(cls, fn); \
++      auto optional = call(self); \
+       return optional.has_value() ? boost::python::object(*optional) : boost::python::object(); \
+     }
+ 
+-- 
+2.42.0
+

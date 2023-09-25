@@ -54,6 +54,7 @@ python3Packages.buildPythonPackage rec {
     ./0001-Allow-compiling-with-Nix.patch
     ./0002-Don-t-fail-when-compiling-with-gcc-12.patch
     ./0003-PythonAPI-Fix-segfault-in-GetAvailableMaps.patch
+    ./0004-PythonAPI-Fix-segfault-in-world.get_random_location_.patch
   ];
 
   passthru = {
