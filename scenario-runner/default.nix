@@ -79,11 +79,21 @@ python3Packages.buildPythonPackage rec {
 
     mkdir -p $out/bin
     cp $src/scenario_runner.py $out/bin
+    cp $src/metrics_manager.py $out/bin/scenario_runner_metrics_manager.py
+    chmod +x $out/bin/scenario_runner_metrics_manager.py
+    cp $src/no_rendering_mode.py $out/bin/scenario_runner_no_rendering_mode.py
     cp $src/manual_control.py $out/bin/scenario_runner_manual_control.py
   '';
 
   makeWrapperArgs = [
     "--prefix PYTHONPATH : ''$out/${python3.sitePackages}"
     "--set-default SCENARIO_RUNNER_ROOT $out/${python3.sitePackages}"
-  ];
+  ] ++ (let
+    # This must be defined here due to nix escaping rules
+    carla-host-arg = ''''${CARLA_HOST:+--host $CARLA_HOST}'';
+    carla-port-arg = ''''${CARLA_PORT:+--port $CARLA_PORT}'';
+  in [
+    "--add-flags '${carla-host-arg}'"
+    "--add-flags '${carla-port-arg}'"
+  ]);
 }

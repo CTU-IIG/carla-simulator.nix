@@ -5,6 +5,7 @@
 , recast
 , fetchFromGitHub
 , carla-src
+, enableDebug ? false
 }:
 
 stdenv.mkDerivation rec {
@@ -20,14 +21,16 @@ stdenv.mkDerivation rec {
   cmakeFlags = [
     "../cmake"
     "-DCMAKE_BUILD_TYPE=Client"
-    "-DLIBCARLA_BUILD_DEBUG=OFF"
-    "-DLIBCARLA_BUILD_RELEASE=ON"
+    "-DLIBCARLA_BUILD_DEBUG=${if enableDebug then "ON" else "OFF"}"
+    "-DLIBCARLA_BUILD_RELEASE=${if !enableDebug then "ON" else "OFF"}"
     "-DCARLA_VERSION=${version}"
     "-DLIBCARLA_BUILD_TEST=OFF"
   ];
+  # Have debug information also in the release build (to debug crashes)
+  #CXXFLAGS = "-g";
   installPhase = ''
     mkdir -p $out/lib
-    cp client/libcarla_client.a $out/lib
+    cp client/libcarla_client*.a $out/lib/libcarla_client.a
     mkdir -p $out/include/carla
     pushd ../source/carla
     cp *.h $out/include/carla

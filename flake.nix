@@ -19,6 +19,7 @@
                       else prev.callPackage (builtins.getAttr version (import ./carla-src/versions.nix)) {};
           carla-client = prev.callPackage carla-client/carla-client {};
           carla-py = prev.python3.pkgs.callPackage carla-client/carla-py {};
+          carla-py-scripts = prev.callPackage carla-client/carla-py/scripts.nix {};
           osm2odr = prev.callPackage carla-client/osm2odr.nix {};
           recast = prev.callPackage carla-client/recastnavigation {};
           rpclib = prev.callPackage carla-client/rpclib.nix {};
