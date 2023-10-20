@@ -9,7 +9,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "carla-client";
+  pname = "libcarla-client";
   version = carla-src.meta.version;
 
   src = carla-src;

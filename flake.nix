@@ -13,7 +13,7 @@
         overlayForVersion = version: final: prev: {
           #carla-bin = builtins.getAttr version (import ./carla-bin/versions.nix { pkgs = final; });
           carla-src = prev.callPackage (builtins.getAttr version (import ./carla-src/versions.nix)) {};
-          carla-client = prev.callPackage carla-client/carla-client {};
+          libcarla-client = prev.callPackage carla-client/libcarla-client {};
           carla-py = prev.python3.pkgs.callPackage carla-client/carla-py {};
           carla-py-scripts = prev.callPackage carla-client/carla-py/scripts.nix {};
           osm2odr = prev.callPackage carla-client/osm2odr.nix {};
