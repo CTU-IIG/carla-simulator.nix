@@ -3,11 +3,11 @@
     "carla-dev": {
       "flake": false,
       "locked": {
-        "lastModified": 1689100834,
-        "narHash": "sha256-5CkMRn01FaTY5ag+xzHtw52g5fcMzbZxCXw0PiYjaw8=",
+        "lastModified": 1697704626,
+        "narHash": "sha256-ajqh+1iKXNyVzlsex9fJZMeyFCg6H2TLFbp+sCPoPHc=",
         "owner": "carla-simulator",
         "repo": "carla",
-        "rev": "bc719a1056494b3fbd0198362cb5a02353534c11",
+        "rev": "827508fcead836c4d00be637bab6d1152114a92a",
         "type": "github"
       },
       "original": {
