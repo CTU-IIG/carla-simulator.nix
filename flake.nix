@@ -27,6 +27,7 @@
         "0.9.12" = overlayForVersion "0.9.12";
         "0.9.13" = overlayForVersion "0.9.13";
         "0.9.14" = overlayForVersion "0.9.14";
+        "local" = overlayForVersion "local";
       };
       packages.x86_64-linux = {
         # Packages that we provide since beginning (backward compatibility)
