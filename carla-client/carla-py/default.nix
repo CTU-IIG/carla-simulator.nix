@@ -7,8 +7,6 @@
 , sqlite
 , xercesc
 , carla-client
-, rpclib
-, recast
 , osm2odr
 , carla-src
 }:
@@ -35,8 +33,6 @@ python3Packages.buildPythonPackage rec {
     python3Packages.distro
     python3Packages.networkx
     python3Packages.shapely
-    recast
-    rpclib
     sqlite.dev
     xercesc
   ];

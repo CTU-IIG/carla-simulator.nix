@@ -15,7 +15,7 @@ stdenv.mkDerivation rec {
   src = carla-src;
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ boost rpclib recast ];
+  propagatedBuildInputs = [ boost rpclib recast ];
   sourceRoot = "source/LibCarla";
   patches = [ ./carla_client.patch ];
   cmakeFlags = [
