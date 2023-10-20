@@ -15,6 +15,7 @@ git+file:///home/wsh/src/carla/nix
 │       └───ci: derivation 'carla-all'
 ├───devShells
 │   └───x86_64-linux
+│       ├───carla-cpp: development environment 'Shell-for-building-CARLA-C++-examples'
 │       ├───carla-py: development environment 'Shell-for-running-CARLA-PythonAPI-examples'
 │       └───default: development environment 'nix-shell'
 ├───overlays
@@ -44,6 +45,8 @@ The outputs are documented in more detail below. Unfinished
 
 ### `devShells`
 
+#### Python
+
 To quickly try CARLA Python bindings from this repository, execute
 CARLA (e.g. via [a package in this repo](#packages)) and then run:
 
@@ -59,6 +62,22 @@ NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:guibou/nixGL -- ./manual_control.
 ```
 
 [NixGL]: https://github.com/guibou/nixGL
+
+#### C++
+
+To compile CARLA `CppClient` example, run:
+
+    nix develop .#carla-cpp
+    cd <CARLA_SOURCES>/Examples/CppClient
+    g++ -std=c++14 -pthread -fPIC -O3 -DNDEBUG -Werror -Wall -Wextra -o cpp_client main.cpp \
+        -Wl,-Bstatic -lcarla_client -lrpc \
+        -Wl,-Bdynamic -lpng -ltiff -ljpeg -lRecast -lDetour -lDetourCrowd -lboost_filesystem
+
+
+Instead of running `g++` manually, you can use the `Makefile` coming
+with the example, but you need to modify it not to use hardcoded
+compiler paths, not to build `libcarla` and to link `boost_filesystem`
+dynamically.
 
 ### `overlays`
 

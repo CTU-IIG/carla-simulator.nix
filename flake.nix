@@ -40,7 +40,6 @@
       devShells.x86_64-linux = {
         # Attempt to have a shell where one can build CARLA
         default = import ./build-env/shell.nix { inherit pkgs; };
-        # A shell for running CARLA PythonAPI examples
         carla-py = pkgs.mkShell {
           name = "Shell for running CARLA PythonAPI examples";
           packages = [
@@ -51,6 +50,16 @@
               p.opencv4
               p.networkx
             ]))
+          ];
+        };
+        carla-cpp = pkgs.mkShell {
+          name = "Shell for building CARLA C++ examples";
+          packages = [
+            pkgs.bashInteractive
+            self.packages.x86_64-linux.libcarla-client
+            pkgs.libpng
+            pkgs.libjpeg
+            pkgs.libtiff
           ];
         };
       };
