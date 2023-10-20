@@ -13,10 +13,10 @@ stdenv.mkDerivation rec {
   version = carla-src.meta.version;
 
   src = carla-src;
+  prePatch = "cd LibCarla";
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ boost rpclib recast ];
-  sourceRoot = "source/LibCarla";
   patches = [ ./carla_client.patch ];
   cmakeFlags = [
     "../cmake"
