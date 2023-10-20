@@ -17,7 +17,7 @@
           carla-src = if version == "dev"
                       then carla-dev // { meta.version = "dev-${carla-dev.shortRev}"; }
                       else prev.callPackage (builtins.getAttr version (import ./carla-src/versions.nix)) {};
-          carla-client = prev.callPackage carla-client/carla-client {};
+          libcarla-client = prev.callPackage carla-client/libcarla-client {};
           carla-py = prev.python3.pkgs.callPackage carla-client/carla-py {};
           carla-py-scripts = prev.callPackage carla-client/carla-py/scripts.nix {};
           osm2odr = prev.callPackage carla-client/osm2odr.nix {};
@@ -31,6 +31,7 @@
         "0.9.12" = overlayForVersion "0.9.12";
         "0.9.13" = overlayForVersion "0.9.13";
         "0.9.14" = overlayForVersion "0.9.14";
+        "local" = overlayForVersion "local";
         "dev" = overlayForVersion "dev";
       };
       packages.x86_64-linux = {
@@ -45,7 +46,6 @@
       devShells.x86_64-linux = {
         # Attempt to have a shell where one can build CARLA
         default = import ./build-env/shell.nix { inherit pkgs; };
-        # A shell for running CARLA PythonAPI examples
         carla-py = pkgs.mkShell {
           name = "Shell for running CARLA PythonAPI examples";
           packages = [
@@ -56,6 +56,16 @@
               p.opencv4
               p.networkx
             ]))
+          ];
+        };
+        carla-cpp = pkgs.mkShell {
+          name = "Shell for building CARLA C++ examples";
+          packages = [
+            pkgs.bashInteractive
+            self.packages.x86_64-linux.libcarla-client
+            pkgs.libpng
+            pkgs.libjpeg
+            pkgs.libtiff
           ];
         };
       };

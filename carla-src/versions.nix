@@ -11,4 +11,9 @@
     version = "0.9.14";
     src-hash = "sha256-7c6gi7lxnuQm4CBybJAXeUxKQRcQ6SIJUCz3Rlc6sP4=";
   };
+
+  # TODO: Update the path below to where you have CARLA sources
+  "local" = { runCommandLocal }: runCommandLocal "carla-src-local" { meta.version = "local"; } ''
+    cp -a ${/home/wsh/src/carla/carla} $out
+  '';
 }

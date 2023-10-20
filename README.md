@@ -15,6 +15,7 @@ git+file:///home/wsh/src/carla/nix
 │       └───ci: derivation 'carla-all'
 ├───devShells
 │   └───x86_64-linux
+│       ├───carla-cpp: development environment 'Shell-for-building-CARLA-C++-examples'
 │       ├───carla-py: development environment 'Shell-for-running-CARLA-PythonAPI-examples'
 │       └───default: development environment 'nix-shell'
 ├───overlays
@@ -26,10 +27,10 @@ git+file:///home/wsh/src/carla/nix
         ├───carla-bin_0_9_12: package 'CarlaUE4.sh'
         ├───carla-bin_0_9_13: package 'CarlaUE4.sh'
         ├───carla-bin_0_9_14: package 'CarlaUE4.sh'
-        ├───carla-client: package 'carla-client-0.9.14'
         ├───carla-py: package 'python3.10-carla-py-0.9.14'
         ├───carla-py-scripts: package 'carla-py-scripts-0.9.14'
         ├───carla-src: package 'source'
+        ├───libcarla-client: package 'libcarla-client-0.9.14'
         ├───opencv-python: package 'python3.10-opencv-python-4.8.0.74'
         ├───osm2odr: package 'osm2odr-0.pre+date=2022-08-30'
         ├───recast: package 'recast-0.pre+date=2022-08-30'
@@ -43,6 +44,8 @@ The outputs are documented in more detail below. Unfinished
 (experimental) outputs are omitted.
 
 ### `devShells`
+
+#### Python
 
 To quickly try CARLA Python bindings from this repository, execute
 CARLA (e.g. via [a package in this repo](#packages)) and then run:
@@ -59,6 +62,22 @@ NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:guibou/nixGL -- ./manual_control.
 ```
 
 [NixGL]: https://github.com/guibou/nixGL
+
+#### C++
+
+To compile CARLA `CppClient` example, run:
+
+    nix develop .#carla-cpp
+    cd <CARLA_SOURCES>/Examples/CppClient
+    g++ -std=c++14 -pthread -fPIC -O3 -DNDEBUG -Werror -Wall -Wextra -o cpp_client main.cpp \
+        -Wl,-Bstatic -lcarla_client -lrpc \
+        -Wl,-Bdynamic -lpng -ltiff -ljpeg -lRecast -lDetour -lDetourCrowd -lboost_filesystem
+
+
+Instead of running `g++` manually, you can use the `Makefile` coming
+with the example, but you need to modify it not to use hardcoded
+compiler paths, not to build `libcarla` and to link `boost_filesystem`
+dynamically.
 
 ### `overlays`
 

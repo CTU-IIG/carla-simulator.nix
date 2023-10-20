@@ -6,9 +6,7 @@
 , proj
 , sqlite
 , xercesc
-, carla-client
-, rpclib
-, recast
+, libcarla-client
 , osm2odr
 , carla-src
 }:
@@ -25,7 +23,7 @@ python3Packages.buildPythonPackage rec {
   separateDebugInfo = true;
 
   buildInputs = [
-    carla-client
+    libcarla-client
     libjpeg.dev
     libpng.dev
     libtiff.dev
@@ -35,8 +33,6 @@ python3Packages.buildPythonPackage rec {
     python3Packages.distro
     python3Packages.networkx
     python3Packages.shapely
-    recast
-    rpclib
     sqlite.dev
     xercesc
   ];

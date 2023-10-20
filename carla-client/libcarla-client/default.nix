@@ -9,14 +9,14 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "carla-client";
+  pname = "libcarla-client";
   version = carla-src.meta.version;
 
   src = carla-src;
+  prePatch = "cd LibCarla";
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ boost rpclib recast ];
-  sourceRoot = "source/LibCarla";
+  propagatedBuildInputs = [ boost rpclib recast ];
   patches = [ ./carla_client.patch ];
   cmakeFlags = [
     "../cmake"
