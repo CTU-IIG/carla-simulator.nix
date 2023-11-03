@@ -7,6 +7,7 @@
 , openblas
 , libpng
 , zlib
+, lib
 }:
 let
   opencvInstallExtraFile = extra: ''
@@ -34,6 +35,13 @@ python3Packages.buildPythonPackage rec {
     hash = "sha256-zHrbvNERKHejknQQbLJ1LgSYS8AaAxFilS6XRQ1hF/Y=";
   };
 
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace 'setuptools==59.2.0' 'setuptools' \
+      --replace 'numpy==1.21.2' 'numpy' \
+      --replace 'numpy==1.22.2' 'numpy'
+  '';
+
   preConfigure = ''
       # See cmake/OpenCVDownload.cmake in OpenCV sources
       export OPENCV_DOWNLOAD_PATH=$PWD/.cache
@@ -44,7 +52,9 @@ python3Packages.buildPythonPackage rec {
     cmake
     ninja
     python3Packages.scikit-build
-  ];
+    python3Packages.pip
+    python3Packages.setuptools
+  ] ++ (lib.optional (python3Packages ? cmake) python3Packages.cmake);
 
   buildInputs = [
     ffmpeg
