@@ -26,12 +26,12 @@ let
 in
 python3Packages.buildPythonPackage rec {
   pname = "opencv-python";
-  version = "4.8.0.74";
+  version = "4.8.1.78";
   format = "pyproject";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-AJ4841agzS10I3I+AKMv09PMW7WXDtJ6mh+KjyIdHbU=";
+    hash = "sha256-zHrbvNERKHejknQQbLJ1LgSYS8AaAxFilS6XRQ1hF/Y=";
   };
 
   preConfigure = ''
