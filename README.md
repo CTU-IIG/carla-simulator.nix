@@ -9,7 +9,7 @@ related tools. Its content is as follows:
 
 <!-- `$ nix flake show` -->
 ```
-git+file:///home/wsh/src/carla/nix
+git+file:///home/wsh/src/carla/nix?ref=refs/heads/tmp&rev=085c0715fccd5be9fa38db4f8276d917a09b8f73
 ├───checks
 │   └───x86_64-linux
 │       └───ci: derivation 'carla-all'
@@ -21,7 +21,8 @@ git+file:///home/wsh/src/carla/nix
 ├───overlays
 │   ├───"0.9.12": Nixpkgs overlay
 │   ├───"0.9.13": Nixpkgs overlay
-│   └───"0.9.14": Nixpkgs overlay
+│   ├───"0.9.14": Nixpkgs overlay
+│   └───local: Nixpkgs overlay
 └───packages
     └───x86_64-linux
         ├───carla-bin_0_9_12: package 'CarlaUE4.sh'
@@ -31,7 +32,7 @@ git+file:///home/wsh/src/carla/nix
         ├───carla-py-scripts: package 'carla-py-scripts-0.9.14'
         ├───carla-src: package 'source'
         ├───libcarla-client: package 'libcarla-client-0.9.14'
-        ├───opencv-python: package 'python3.10-opencv-python-4.8.0.74'
+        ├───opencv-python: package 'python3.10-opencv-python-4.8.1.78'
         ├───osm2odr: package 'osm2odr-0.pre+date=2022-08-30'
         ├───recast: package 'recast-0.pre+date=2022-08-30'
         ├───rpclib: package 'rpclib-0.pre+date=2022-08-30'
