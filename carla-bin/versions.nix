@@ -23,4 +23,8 @@ in {
       version = "0.9.14";
       src-hash = "sha256-3SBze9jhpSL0D6EbHPMBSk3viRTFQddN84j2AiBrQlI=";
     };
+  "0.9.15" = wrap-carla {
+      version = "0.9.15";
+      src-hash = "sha256-ey9DLOdLJRWT+V3Mje5tma2WJcKnGi1tSPJNh53hnvc=";
+    };
 }

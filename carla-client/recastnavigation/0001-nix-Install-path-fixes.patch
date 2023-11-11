@@ -1,0 +1,30 @@
+From 66b0dc9ecd9752681832d88bc04796464c19f88f Mon Sep 17 00:00:00 2001
+From: Michal Sojka <michal.sojka@cvut.cz>
+Date: Thu, 17 Aug 2023 01:24:21 +0200
+Subject: [PATCH] nix: Install path fixes
+
+Without this, the generated .pc file contains incorrect paths.
+---
+ CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dd6c82f..45dbe55 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -31,9 +31,9 @@ install(FILES "${RecastNavigation_BINARY_DIR}/version.h" DESTINATION
+ # Needed for recastnavigation.pc.in
+ set(prefix ${CMAKE_INSTALL_PREFIX})
+ set(exec_prefix "\${prefix}")
+-set(libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
+-set(bindir "\${exec_prefix}/${CMAKE_INSTALL_BINDIR}")
+-set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
++set(libdir "${CMAKE_INSTALL_LIBDIR}")
++set(bindir "${CMAKE_INSTALL_BINDIR}")
++set(includedir "${CMAKE_INSTALL_INCLUDEDIR}")
+ set(PACKAGE_VERSION "${LIB_VERSION}")
+ configure_file(
+         "${RecastNavigation_SOURCE_DIR}/recastnavigation.pc.in"
+-- 
+2.40.1
+

@@ -6,6 +6,7 @@
   outputs = { self, nixpkgs }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      lib = pkgs.lib;
       carla-bin-versions = import ./carla-bin/versions.nix { inherit pkgs; };
       packagesInOverlay = self.overlays."0.9.12" null null;
     in {
@@ -17,7 +18,9 @@
           carla-py = prev.python3.pkgs.callPackage carla-client/carla-py {};
           carla-py-scripts = prev.callPackage carla-client/carla-py/scripts.nix {};
           osm2odr = prev.callPackage carla-client/osm2odr.nix {};
-          recast = prev.callPackage carla-client/recastnavigation {};
+          recast = if lib.versionAtLeast version "0.9.15"
+                   then prev.callPackage carla-client/recastnavigation/0.9.15.nix {}
+                   else prev.callPackage carla-client/recastnavigation {};
           rpclib = prev.callPackage carla-client/rpclib.nix {};
           opencv-python = prev.callPackage ./opencv-python {};
           scenic = prev.callPackage ./scenic {};
@@ -27,6 +30,7 @@
         "0.9.12" = overlayForVersion "0.9.12";
         "0.9.13" = overlayForVersion "0.9.13";
         "0.9.14" = overlayForVersion "0.9.14";
+        "0.9.15" = overlayForVersion "0.9.15";
         "local" = overlayForVersion "local";
       };
       packages.x86_64-linux = {
@@ -36,8 +40,9 @@
         carla-bin_0_9_12 = carla-bin-versions."0.9.12";
         carla-bin_0_9_13 = carla-bin-versions."0.9.13";
         carla-bin_0_9_14 = carla-bin-versions."0.9.14";
+        carla-bin_0_9_15 = carla-bin-versions."0.9.15";
       } // # Add also all packages from our overlay
-      (builtins.intersectAttrs packagesInOverlay (pkgs.extend self.overlays."0.9.14"));
+      (builtins.intersectAttrs packagesInOverlay (pkgs.extend self.overlays."0.9.15"));
       devShells.x86_64-linux = {
         # Attempt to have a shell where one can build CARLA
         default = import ./build-env/shell.nix { inherit pkgs; };
@@ -45,7 +50,7 @@
           name = "Shell for running CARLA PythonAPI examples";
           packages = [
             (pkgs.python3.withPackages(p: [
-              (pkgs.extend self.overlays."0.9.14").carla-py
+              (pkgs.extend self.overlays."0.9.15").carla-py
               p.pygame
               p.transforms3d
               p.opencv4
@@ -73,6 +78,7 @@
           // (pkgsFromOverlay "0.9.12")
           // (pkgsFromOverlay "0.9.13")
           // (pkgsFromOverlay "0.9.14")
+          // (pkgsFromOverlay "0.9.15")
         );
     };
 }

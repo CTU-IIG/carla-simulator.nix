@@ -1,0 +1,88 @@
+From bb9a15a15d9e5ad6ca81718d2c558dae6e1aaaeb Mon Sep 17 00:00:00 2001
+From: Michal Sojka <michal.sojka@cvut.cz>
+Date: Thu, 17 Aug 2023 00:38:35 +0200
+Subject: [PATCH] Allow compiling with Nix
+
+---
+ setup.py | 39 ++++++++++++++++++---------------------
+ 1 file changed, 18 insertions(+), 21 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 717f0572a..9ae9d2db3 100755
+--- a/setup.py
++++ b/setup.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright (c) 2019 Computer Vision Center (CVC) at the Universitat Autonoma de
+ # Barcelona (UAB).
+@@ -32,38 +32,35 @@ def get_libcarla_extensions():
+                 yield os.path.join(root, filename)
+ 
+     if os.name == "posix":
+-        import distro
+-
+-        linux_distro = distro.linux_distribution()[0]
+-        if linux_distro.lower() in ["ubuntu", "debian", "deepin"]:
++        if True:
+             pwd = os.path.dirname(os.path.realpath(__file__))
+-            pylib = "libboost_python%d%d.a" % (sys.version_info.major,
+-                                               sys.version_info.minor)
++            pylib = "-lboost_python%d%d" % (sys.version_info.major,
++                                            sys.version_info.minor)
+             if is_rss_variant_enabled():
+                 print('Building AD RSS variant.')
++                # TODO: look at RSS
+                 extra_link_args = [ os.path.join(pwd, 'dependencies/lib/libcarla_client_rss.a') ]
+             else:
+-                extra_link_args = [ os.path.join(pwd, 'dependencies/lib/libcarla_client.a') ]
++                extra_link_args = [ '-lcarla_client' ]
+ 
+             extra_link_args += [
+-                os.path.join(pwd, 'dependencies/lib/librpc.a'),
+-                os.path.join(pwd, 'dependencies/lib/libboost_filesystem.a'),
+-                os.path.join(pwd, 'dependencies/lib/libRecast.a'),
+-                os.path.join(pwd, 'dependencies/lib/libDetour.a'),
+-                os.path.join(pwd, 'dependencies/lib/libDetourCrowd.a'),
+-                os.path.join(pwd, 'dependencies/lib/libosm2odr.a'),
+-                os.path.join(pwd, 'dependencies/lib/libxerces-c.a')]
++                '-lrpc',
++                '-lboost_filesystem',
++                '-lRecast',
++                '-lDetour',
++                '-lDetourCrowd',
++                '-losm2odr',
++                '-lxerces-c']
+             extra_link_args += ['-lz']
+             extra_compile_args = [
+                 '-isystem', 'dependencies/include/system', '-fPIC', '-std=c++14',
+                 '-Werror', '-Wall', '-Wextra', '-Wpedantic', '-Wno-self-assign-overloaded',
+                 '-Wdeprecated', '-Wno-shadow', '-Wuninitialized', '-Wunreachable-code',
+                 '-Wpessimizing-move', '-Wold-style-cast', '-Wnull-dereference',
+-                '-Wduplicate-enum', '-Wnon-virtual-dtor', '-Wheader-hygiene',
+-                '-Wconversion', '-Wfloat-overflow-conversion',
++                '-Wnon-virtual-dtor', '-Wconversion',
+                 '-DBOOST_ERROR_CODE_HEADER_ONLY', '-DLIBCARLA_WITH_PYTHON_SUPPORT',
+-                '-stdlib=libstdc++'
+             ]
++            # TODO: RSS...
+             if is_rss_variant_enabled():
+                 extra_compile_args += ['-DLIBCARLA_RSS_ENABLED']
+                 extra_compile_args += ['-DLIBCARLA_PYTHON_MAJOR_' +  str(sys.version_info.major)]
+@@ -83,9 +80,9 @@ def get_libcarla_extensions():
+ 
+             # libproj, libsqlite and python libs are also required for rss_variant, therefore
+             # place them after the rss_variant linked libraries
+-            extra_link_args += [os.path.join(pwd, 'dependencies/lib/libproj.a'),
+-                                os.path.join(pwd, 'dependencies/lib/libsqlite3.a'),
+-                                os.path.join(pwd, 'dependencies/lib', pylib)]
++            extra_link_args += ['-lproj',
++                                '-lsqlite3',
++                                pylib]
+ 
+             if 'TRAVIS' in os.environ and os.environ['TRAVIS'] == 'true':
+                 print('Travis CI build detected: disabling PNG support.')
+-- 
+2.40.1
+

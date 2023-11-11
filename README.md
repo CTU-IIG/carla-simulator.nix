@@ -22,19 +22,21 @@ carla-simulator.nix
 │   ├───"0.9.12": Nixpkgs overlay
 │   ├───"0.9.13": Nixpkgs overlay
 │   ├───"0.9.14": Nixpkgs overlay
+│   ├───"0.9.15": Nixpkgs overlay
 │   └───local: Nixpkgs overlay
 └───packages
     └───x86_64-linux
         ├───carla-bin_0_9_12: package 'CarlaUE4.sh'
         ├───carla-bin_0_9_13: package 'CarlaUE4.sh'
         ├───carla-bin_0_9_14: package 'CarlaUE4.sh'
-        ├───carla-py: package 'python3.10-carla-py-0.9.14'
-        ├───carla-py-scripts: package 'carla-py-scripts-0.9.14'
+        ├───carla-bin_0_9_15: package 'CarlaUE4.sh'
+        ├───carla-py: package 'python3.10-carla-py-0.9.15'
+        ├───carla-py-scripts: package 'carla-py-scripts-0.9.15'
         ├───carla-src: package 'source'
-        ├───libcarla-client: package 'libcarla-client-0.9.14'
+        ├───libcarla-client: package 'libcarla-client-0.9.15'
         ├───opencv-python: package 'python3.10-opencv-python-4.8.1.78'
         ├───osm2odr: package 'osm2odr-0.pre+date=2022-08-30'
-        ├───recast: package 'recast-0.pre+date=2022-08-30'
+        ├───recast: package 'recast-0.pre+date=2023-02-21'
         ├───rpclib: package 'rpclib-0.pre+date=2022-08-30'
         ├───scenario-runner: package 'python3.10-scenario-runner-0.9.13'
         ├───scenic: package 'python3.10-scenic-2.1.0'
