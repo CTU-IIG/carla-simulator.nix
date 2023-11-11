@@ -7,9 +7,9 @@ To use this repository, you have to [install Nix][].
 The repository contains a [Nix flake][] with the CARLA simulator and
 related tools. Its content is as follows:
 
-<!-- `$ nix flake show` -->
+<!-- `$ nix flake show | sed -e '1ccarla-simulator.nix'` -->
 ```
-git+file:///home/wsh/src/carla/nix?ref=refs/heads/tmp&rev=085c0715fccd5be9fa38db4f8276d917a09b8f73
+carla-simulator.nix
 ├───checks
 │   └───x86_64-linux
 │       └───ci: derivation 'carla-all'
