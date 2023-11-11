@@ -17,29 +17,60 @@ carla-simulator.nix
 │   └───x86_64-linux
 │       ├───carla-cpp: development environment 'Shell-for-building-CARLA-C++-examples'
 │       ├───carla-py: development environment 'Shell-for-running-CARLA-PythonAPI-examples'
-│       └───default: development environment 'nix-shell'
+│       └───default: development environment 'carla-build-shell-env'
+├───legacyPackages
+│   └───x86_64-linux omitted (use '--legacy' to show)
 ├───overlays
 │   ├───"0.9.12": Nixpkgs overlay
 │   ├───"0.9.13": Nixpkgs overlay
 │   ├───"0.9.14": Nixpkgs overlay
-│   ├───"0.9.15": Nixpkgs overlay
-│   └───local: Nixpkgs overlay
+│   └───"0.9.15": Nixpkgs overlay
 └───packages
     └───x86_64-linux
-        ├───carla-bin_0_9_12: package 'CarlaUE4.sh'
-        ├───carla-bin_0_9_13: package 'CarlaUE4.sh'
-        ├───carla-bin_0_9_14: package 'CarlaUE4.sh'
-        ├───carla-bin_0_9_15: package 'CarlaUE4.sh'
-        ├───carla-py: package 'python3.10-carla-py-0.9.15'
-        ├───carla-py-scripts: package 'carla-py-scripts-0.9.15'
-        ├───carla-src: package 'source'
-        ├───libcarla-client: package 'libcarla-client-0.9.15'
-        ├───opencv-python: package 'python3.10-opencv-python-4.8.1.78'
-        ├───osm2odr: package 'osm2odr-0.pre+date=2022-08-30'
-        ├───recast: package 'recast-0.pre+date=2023-02-21'
-        ├───rpclib: package 'rpclib-0.pre+date=2022-08-30'
-        ├───scenario-runner: package 'python3.10-scenario-runner-0.9.13'
-        ├───scenic: package 'python3.10-scenic-2.1.0'
+        ├───"carla-bin-0.9.12": package 'CarlaUE4.sh'
+        ├───"carla-bin-0.9.13": package 'CarlaUE4.sh'
+        ├───"carla-bin-0.9.14": package 'CarlaUE4.sh'
+        ├───"carla-bin-0.9.15": package 'CarlaUE4.sh'
+        ├───"carla-py-0.9.12": package 'python3.10-carla-py-0.9.12'
+        ├───"carla-py-0.9.13": package 'python3.10-carla-py-0.9.13'
+        ├───"carla-py-0.9.14": package 'python3.10-carla-py-0.9.14'
+        ├───"carla-py-0.9.15": package 'python3.10-carla-py-0.9.15'
+        ├───"carla-py-scripts-0.9.12": package 'carla-py-scripts-0.9.12'
+        ├───"carla-py-scripts-0.9.13": package 'carla-py-scripts-0.9.13'
+        ├───"carla-py-scripts-0.9.14": package 'carla-py-scripts-0.9.14'
+        ├───"carla-py-scripts-0.9.15": package 'carla-py-scripts-0.9.15'
+        ├───"carla-src-0.9.12": package 'source'
+        ├───"carla-src-0.9.13": package 'source'
+        ├───"carla-src-0.9.14": package 'source'
+        ├───"carla-src-0.9.15": package 'source'
+        ├───"libcarla-client-0.9.12": package 'libcarla-client-0.9.12'
+        ├───"libcarla-client-0.9.13": package 'libcarla-client-0.9.13'
+        ├───"libcarla-client-0.9.14": package 'libcarla-client-0.9.14'
+        ├───"libcarla-client-0.9.15": package 'libcarla-client-0.9.15'
+        ├───"opencv-python-0.9.12": package 'python3.10-opencv-python-4.8.1.78'
+        ├───"opencv-python-0.9.13": package 'python3.10-opencv-python-4.8.1.78'
+        ├───"opencv-python-0.9.14": package 'python3.10-opencv-python-4.8.1.78'
+        ├───"opencv-python-0.9.15": package 'python3.10-opencv-python-4.8.1.78'
+        ├───"osm2odr-0.9.12": package 'osm2odr-0.pre+date=2022-08-30'
+        ├───"osm2odr-0.9.13": package 'osm2odr-0.pre+date=2022-08-30'
+        ├───"osm2odr-0.9.14": package 'osm2odr-0.pre+date=2022-08-30'
+        ├───"osm2odr-0.9.15": package 'osm2odr-0.pre+date=2022-08-30'
+        ├───"recast-0.9.12": package 'recast-0.pre+date=2022-08-30'
+        ├───"recast-0.9.13": package 'recast-0.pre+date=2022-08-30'
+        ├───"recast-0.9.14": package 'recast-0.pre+date=2022-08-30'
+        ├───"recast-0.9.15": package 'recast-0.pre+date=2023-02-21'
+        ├───"rpclib-0.9.12": package 'rpclib-0.pre+date=2022-08-30'
+        ├───"rpclib-0.9.13": package 'rpclib-0.pre+date=2022-08-30'
+        ├───"rpclib-0.9.14": package 'rpclib-0.pre+date=2022-08-30'
+        ├───"rpclib-0.9.15": package 'rpclib-0.pre+date=2022-08-30'
+        ├───"scenario-runner-0.9.12": package 'python3.10-scenario-runner-0.9.13'
+        ├───"scenario-runner-0.9.13": package 'python3.10-scenario-runner-0.9.13'
+        ├───"scenario-runner-0.9.14": package 'python3.10-scenario-runner-0.9.13'
+        ├───"scenario-runner-0.9.15": package 'python3.10-scenario-runner-0.9.13'
+        ├───"scenic-0.9.12": package 'python3.10-scenic-2.1.0'
+        ├───"scenic-0.9.13": package 'python3.10-scenic-2.1.0'
+        ├───"scenic-0.9.14": package 'python3.10-scenic-2.1.0'
+        ├───"scenic-0.9.15": package 'python3.10-scenic-2.1.0'
         └───ue4: package 'ue4-carla-0.9.13-wrapper'
 ```
 

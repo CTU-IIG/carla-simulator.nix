@@ -6,19 +6,20 @@
   outputs = { self, nixpkgs }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
-      lib = pkgs.lib;
+      inherit (pkgs.lib) last versionAtLeast genAttrs concatMap;
       carla-bin-versions = import ./carla-bin/versions.nix { inherit pkgs; };
-      packagesInOverlay = self.overlays."0.9.12" null null;
+      allVersions = [ "0.9.12" "0.9.13" "0.9.14" "0.9.15" ];
+      lastVersion = last allVersions;
     in {
       overlays = let
         overlayForVersion = version: final: prev: {
-          #carla-bin = builtins.getAttr version (import ./carla-bin/versions.nix { pkgs = final; });
+          carla-bin = carla-bin-versions.${version};
           carla-src = prev.callPackage (builtins.getAttr version (import ./carla-src/versions.nix)) {};
           libcarla-client = prev.callPackage carla-client/libcarla-client {};
           carla-py = prev.python3.pkgs.callPackage carla-client/carla-py {};
           carla-py-scripts = prev.callPackage carla-client/carla-py/scripts.nix {};
           osm2odr = prev.callPackage carla-client/osm2odr.nix {};
-          recast = if lib.versionAtLeast version "0.9.15"
+          recast = if versionAtLeast version "0.9.15"
                    then prev.callPackage carla-client/recastnavigation/0.9.15.nix {}
                    else prev.callPackage carla-client/recastnavigation {};
           rpclib = prev.callPackage carla-client/rpclib.nix {};
@@ -26,23 +27,32 @@
           scenic = prev.callPackage ./scenic {};
           scenario-runner = prev.callPackage ./scenario-runner {};
         };
-      in {
-        "0.9.12" = overlayForVersion "0.9.12";
-        "0.9.13" = overlayForVersion "0.9.13";
-        "0.9.14" = overlayForVersion "0.9.14";
-        "0.9.15" = overlayForVersion "0.9.15";
-        "local" = overlayForVersion "local";
-      };
-      packages.x86_64-linux = {
-        # Packages that we provide since beginning (backward compatibility)
-        ue4 = pkgs.callPackage ./carla-simulator/carla-ue4.nix {};
+      in
+        genAttrs allVersions (v: overlayForVersion v);
 
-        carla-bin_0_9_12 = carla-bin-versions."0.9.12";
-        carla-bin_0_9_13 = carla-bin-versions."0.9.13";
-        carla-bin_0_9_14 = carla-bin-versions."0.9.14";
-        carla-bin_0_9_15 = carla-bin-versions."0.9.15";
-      } // # Add also all packages from our overlay
-      (builtins.intersectAttrs packagesInOverlay (pkgs.extend self.overlays."0.9.15"));
+      legacyPackages.x86_64-linux =
+        genAttrs allVersions (version:
+          # All packages from our overlay
+          (builtins.intersectAttrs
+            (self.overlays.${version} null null)
+            (pkgs.extend self.overlays.${version})));
+
+      packages.x86_64-linux =
+        builtins.listToAttrs
+          (concatMap (version:
+            map (name: {
+              name = "${name}-${version}";
+              value = (import nixpkgs {
+                system = "x86_64-linux";
+                overlays = [ self.overlays.${version} ];
+              }).${name};
+            }) (builtins.attrNames (self.overlays.${version} null null))
+          ) allVersions)
+        // {
+          # Package that we provide since beginning (backward compatibility)
+          ue4 = pkgs.callPackage ./carla-simulator/carla-ue4.nix {};
+        };
+
       devShells.x86_64-linux = {
         # Attempt to have a shell where one can build CARLA
         default = import ./build-env/shell.nix { inherit pkgs; };
@@ -50,7 +60,7 @@
           name = "Shell for running CARLA PythonAPI examples";
           packages = [
             (pkgs.python3.withPackages(p: [
-              (pkgs.extend self.overlays."0.9.15").carla-py
+              (pkgs.extend self.overlays.${lastVersion}).carla-py
               p.pygame
               p.transforms3d
               p.opencv4
@@ -62,23 +72,15 @@
           name = "Shell for building CARLA C++ examples";
           packages = [
             pkgs.bashInteractive
-            self.packages.x86_64-linux.libcarla-client
+            self.packages.x86_64-linux."libcarla-client-${lastVersion}"
             pkgs.libpng
             pkgs.libjpeg
             pkgs.libtiff
           ];
         };
       };
-      checks.x86_64-linux.ci = let
-        pkgsFromOverlay = version: pkgs.lib.attrsets.mapAttrs' (n: v: pkgs.lib.nameValuePair "${n}-${version}" v)
-          (builtins.intersectAttrs packagesInOverlay (pkgs.extend (builtins.getAttr version self.overlays)));
-      in
-        pkgs.linkFarm "carla-all" (
-          (builtins.removeAttrs self.packages.x86_64-linux [ "ue4" ])
-          // (pkgsFromOverlay "0.9.12")
-          // (pkgsFromOverlay "0.9.13")
-          // (pkgsFromOverlay "0.9.14")
-          // (pkgsFromOverlay "0.9.15")
-        );
+      checks.x86_64-linux.ci =
+        pkgs.linkFarm "carla-all"
+          (builtins.removeAttrs self.packages.x86_64-linux [ "ue4" ]);
     };
 }
