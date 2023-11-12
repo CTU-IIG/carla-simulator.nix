@@ -15,6 +15,7 @@
 , systemd
 , vulkan-loader
 , xorg
+, zlib
 }:
 
 let
@@ -50,6 +51,7 @@ stdenv.mkDerivation rec {
     makeWrapper
     llvmPackages_8.openmp
     libusb1
+    zlib
   ];
 
   dontUnpack = true;
