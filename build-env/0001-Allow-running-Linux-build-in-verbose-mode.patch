@@ -1,0 +1,429 @@
+From 585db660b4c58a31a09e45d90d089cd473218864 Mon Sep 17 00:00:00 2001
+From: Michal Sojka <michal.sojka@cvut.cz>
+Date: Sun, 19 Nov 2023 19:22:02 +0100
+Subject: [PATCH 1/2] Allow running Linux build in verbose mode
+
+Building CARLA on a different system than Ubuntu is difficult. To make
+hacking the buildsystem to work elsewhere easier, this introduces the
+verbose mode, which shows all commands run. The mode is activated by
+setting the make variable VERBOSE to 1, e.g.:
+
+    make launch VERBOSE=1
+---
+ Util/BuildTools/BuildCarlaUE4.sh    |   2 +
+ Util/BuildTools/BuildLibCarla.sh    |   2 +
+ Util/BuildTools/BuildOSM2ODR.sh     |   3 +
+ Util/BuildTools/BuildOSMRenderer.sh |   2 +
+ Util/BuildTools/BuildPythonAPI.sh   |   2 +
+ Util/BuildTools/BuildUE4Plugins.sh  |   3 +
+ Util/BuildTools/BuildUtilsDocker.sh |   2 +
+ Util/BuildTools/Check.sh            |   2 +
+ Util/BuildTools/Deploy.sh           |   2 +
+ Util/BuildTools/Import.sh           |   2 +
+ Util/BuildTools/Linux.mk            | 123 +++++++++++++++-------------
+ Util/BuildTools/Package.sh          |   2 +
+ Util/BuildTools/Plugins.sh          |   2 +
+ Util/BuildTools/Prettify.sh         |   2 +
+ Util/BuildTools/Setup.sh            |   2 +
+ 15 files changed, 95 insertions(+), 58 deletions(-)
+
+diff --git a/Util/BuildTools/BuildCarlaUE4.sh b/Util/BuildTools/BuildCarlaUE4.sh
+index 3100fc7ed..1413eb416 100755
+--- a/Util/BuildTools/BuildCarlaUE4.sh
++++ b/Util/BuildTools/BuildCarlaUE4.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Parse arguments -----------------------------------------------------------
+ # ==============================================================================
+diff --git a/Util/BuildTools/BuildLibCarla.sh b/Util/BuildTools/BuildLibCarla.sh
+index 783ed594e..67b314d73 100755
+--- a/Util/BuildTools/BuildLibCarla.sh
++++ b/Util/BuildTools/BuildLibCarla.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Parse arguments -----------------------------------------------------------
+ # ==============================================================================
+diff --git a/Util/BuildTools/BuildOSM2ODR.sh b/Util/BuildTools/BuildOSM2ODR.sh
+index 61e7d449f..7d16e041e 100755
+--- a/Util/BuildTools/BuildOSM2ODR.sh
++++ b/Util/BuildTools/BuildOSM2ODR.sh
+@@ -1,4 +1,7 @@
+ #! /bin/bash
++
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ DOC_STRING="Build OSM2ODR."
+ 
+ USAGE_STRING=$(cat <<- END
+diff --git a/Util/BuildTools/BuildOSMRenderer.sh b/Util/BuildTools/BuildOSMRenderer.sh
+index 0cb2287eb..fc49ff240 100755
+--- a/Util/BuildTools/BuildOSMRenderer.sh
++++ b/Util/BuildTools/BuildOSMRenderer.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ source $(dirname "$0")/Environment.sh
+ 
+ LIBOSMSCOUT_REPO=https://github.com/Framstag/libosmscout
+diff --git a/Util/BuildTools/BuildPythonAPI.sh b/Util/BuildTools/BuildPythonAPI.sh
+index 8a46145de..48107d3b3 100755
+--- a/Util/BuildTools/BuildPythonAPI.sh
++++ b/Util/BuildTools/BuildPythonAPI.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Parse arguments -----------------------------------------------------------
+ # ==============================================================================
+diff --git a/Util/BuildTools/BuildUE4Plugins.sh b/Util/BuildTools/BuildUE4Plugins.sh
+index 4bb412eca..4559d2215 100755
+--- a/Util/BuildTools/BuildUE4Plugins.sh
++++ b/Util/BuildTools/BuildUE4Plugins.sh
+@@ -1,4 +1,7 @@
+ #! /bin/bash
++
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ DOC_STRING="Download StreetMapUE4 Plugin."
+ 
+ USAGE_STRING=$(cat <<- END
+diff --git a/Util/BuildTools/BuildUtilsDocker.sh b/Util/BuildTools/BuildUtilsDocker.sh
+index 2c85a7b05..84499d8f3 100755
+--- a/Util/BuildTools/BuildUtilsDocker.sh
++++ b/Util/BuildTools/BuildUtilsDocker.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ source $(dirname "$0")/Environment.sh
+ 
+ FBX2OBJ_DIST=${CARLA_DOCKER_UTILS_FOLDER}/dist
+diff --git a/Util/BuildTools/Check.sh b/Util/BuildTools/Check.sh
+index c45847ef6..fb464ce96 100755
+--- a/Util/BuildTools/Check.sh
++++ b/Util/BuildTools/Check.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Parse arguments -----------------------------------------------------------
+ # ==============================================================================
+diff --git a/Util/BuildTools/Deploy.sh b/Util/BuildTools/Deploy.sh
+index 55fb6beba..30e66605b 100755
+--- a/Util/BuildTools/Deploy.sh
++++ b/Util/BuildTools/Deploy.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Set up environment --------------------------------------------------------
+ # ==============================================================================
+diff --git a/Util/BuildTools/Import.sh b/Util/BuildTools/Import.sh
+index 7b27e91aa..bc32fea7a 100755
+--- a/Util/BuildTools/Import.sh
++++ b/Util/BuildTools/Import.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Parse arguments -----------------------------------------------------------
+ # ==============================================================================
+diff --git a/Util/BuildTools/Linux.mk b/Util/BuildTools/Linux.mk
+index 8e64f7689..7d1c756ed 100644
+--- a/Util/BuildTools/Linux.mk
++++ b/Util/BuildTools/Linux.mk
+@@ -1,114 +1,121 @@
+ default: help
+ 
++ifeq ($(VERBOSE),1)
++  export VERBOSE
++  Q=
++else
++  Q=@
++endif
++
+ help:
+ 	@less ${CARLA_BUILD_TOOLS_FOLDER}/Linux.mk.help
+ 
+ launch: LibCarla.server.release osm2odr downloadplugins
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --build $(ARGS)
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --build --launch $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --build $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --build --launch $(ARGS)
+ 
+ launch-only:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --launch $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --launch $(ARGS)
+ 
+ import: CarlaUE4Editor PythonAPI
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Import.sh $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Import.sh $(ARGS)
+ 
+ package: CarlaUE4Editor PythonAPI
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Package.sh $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Package.sh $(ARGS)
+ 
+ package.rss: CarlaUE4Editor PythonAPI.rss.rebuild
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Package.sh $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Package.sh $(ARGS)
+ 
+ docs:
+-	@doxygen
++	$(Q)doxygen
+ 	@echo "Documentation index at ./Doxygen/html/index.html"
+ 
+ clean.LibCarla:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --clean
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --clean
+ clean.PythonAPI:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --clean
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --clean
+ clean.CarlaUE4Editor:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --clean $(ARGS)
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --clean
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --clean $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --clean
+ clean.osm2odr:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildOSM2ODR.sh --clean
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildOSM2ODR.sh --clean
+ clean: clean.CarlaUE4Editor clean.PythonAPI clean.LibCarla clean.osm2odr
+ 
+ rebuild: setup
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --rebuild
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildOSM2ODR.sh --rebuild
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rebuild $(ARGS)
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --rebuild $(ARGS)
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --rebuild $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --rebuild
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildOSM2ODR.sh --rebuild
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rebuild $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --rebuild $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --rebuild $(ARGS)
+ 
+ hard-clean:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --clean $(ARGS)
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --hard-clean
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildOSM2ODR.sh --clean
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --clean
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --clean
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --clean $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --hard-clean
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildOSM2ODR.sh --clean
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --clean
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --clean
+ 	@echo "To force recompiling dependencies run: rm -Rf ${CARLA_BUILD_FOLDER}"
+ 
+ check: LibCarla PythonAPI
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --all $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --all $(ARGS)
+ 
+ check.LibCarla: LibCarla
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --libcarla-debug --libcarla-release $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --libcarla-debug --libcarla-release $(ARGS)
+ 
+ check.LibCarla.debug: LibCarla.debug
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --libcarla-debug $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --libcarla-debug $(ARGS)
+ 
+ check.LibCarla.release: LibCarla.release
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --libcarla-release $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --libcarla-release $(ARGS)
+ 
+ check.PythonAPI: PythonAPI
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --python-api $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --python-api $(ARGS)
+ 
+ check.PythonAPI.2: PythonAPI.2
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --python-api --python-version=2 $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --python-api --python-version=2 $(ARGS)
+ 
+ check.PythonAPI.3: PythonAPI.3
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --python-api --python-version=3 $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --python-api --python-version=3 $(ARGS)
+ 
+ benchmark: LibCarla.release
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --benchmark $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --benchmark $(ARGS)
+ 	@cat profiler.csv
+ 
+ smoke_tests:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --smoke $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --smoke $(ARGS)
+ 
+ examples:
+-	@for D in ${CARLA_EXAMPLES_FOLDER}/*; do [ -d "$${D}" ] && make -C $${D} build; done
++	$(Q)for D in ${CARLA_EXAMPLES_FOLDER}/*; do [ -d "$${D}" ] && make -C $${D} build; done
+ 
+ run-examples:
+-	@for D in ${CARLA_EXAMPLES_FOLDER}/*; do [ -d "$${D}" ] && make -C $${D} run.only; done
++	$(Q)for D in ${CARLA_EXAMPLES_FOLDER}/*; do [ -d "$${D}" ] && make -C $${D} run.only; done
+ 
+ CarlaUE4Editor: LibCarla.server.release osm2odr downloadplugins
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --build $(ARGS)
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --build $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --build $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --build $(ARGS)
+ 
+ .PHONY: PythonAPI
+ PythonAPI: LibCarla.client.release osm2odr
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh $(ARGS)
+ 
+ PythonAPI.2: LibCarla.client.release osm2odr
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --python-version=2
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --python-version=2
+ 
+ PythonAPI.3: LibCarla.client.release osm2odr
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --python-version=3
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --python-version=3
+ 
+ PythonAPI.rebuild: LibCarla.client.release osm2odr
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rebuild $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rebuild $(ARGS)
+ 
+ PythonAPI.rss: LibCarla.client.rss.release osm2odr
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rss $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rss $(ARGS)
+ 
+ PythonAPI.rss.rebuild: LibCarla.client.rss.release osm2odr
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rebuild --rss $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rebuild --rss $(ARGS)
+ 
+ PythonAPI.docs:
+-	@python PythonAPI/docs/doc_gen.py
+-	@cd PythonAPI/docs && python3 bp_doc_gen.py
++	$(Q)python PythonAPI/docs/doc_gen.py
++	$(Q)cd PythonAPI/docs && python3 bp_doc_gen.py
+ 
+ .PHONY: LibCarla
+ LibCarla: LibCarla.release LibCarla.debug
+@@ -118,46 +125,46 @@ LibCarla.release: LibCarla.server.release LibCarla.client.release
+ 
+ LibCarla.server: LibCarla.server.debug LibCarla.server.release
+ LibCarla.server.debug: setup
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --server --debug $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --server --debug $(ARGS)
+ LibCarla.server.release: setup
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --server --release $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --server --release $(ARGS)
+ 
+ LibCarla.client: LibCarla.client.debug LibCarla.client.release
+ LibCarla.client.debug: setup
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --client --debug $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --client --debug $(ARGS)
+ LibCarla.client.release: setup
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --client --release $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --client --release $(ARGS)
+ 
+ LibCarla.client.rss: LibCarla.client.rss.debug LibCarla.client.rss.release
+ LibCarla.client.rss.debug: setup ad-rss
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --client --debug --rss
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --client --debug --rss
+ LibCarla.client.rss.release: setup ad-rss
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --client --release --rss
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --client --release --rss
+ 
+ .PHONY: Plugins
+ plugins:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Plugins.sh $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Plugins.sh $(ARGS)
+ 
+ setup downloadplugins:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Setup.sh $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Setup.sh $(ARGS)
+ 
+ ad-rss:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Ad-rss.sh $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Ad-rss.sh $(ARGS)
+ 
+ deploy:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Deploy.sh $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Deploy.sh $(ARGS)
+ 
+ pretty:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/Prettify.sh $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/Prettify.sh $(ARGS)
+ 
+ build.utils: PythonAPI
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildUtilsDocker.sh
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildUtilsDocker.sh
+ 
+ osm2odr:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildOSM2ODR.sh --build $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildOSM2ODR.sh --build $(ARGS)
+ 
+ osmrenderer:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildOSMRenderer.sh
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildOSMRenderer.sh
+ 
+ downloadplugins:
+-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --build $(ARGS)
++	$(Q)${CARLA_BUILD_TOOLS_FOLDER}/BuildUE4Plugins.sh --build $(ARGS)
+diff --git a/Util/BuildTools/Package.sh b/Util/BuildTools/Package.sh
+index 0be72293a..6b5c5e2aa 100755
+--- a/Util/BuildTools/Package.sh
++++ b/Util/BuildTools/Package.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Parse arguments -----------------------------------------------------------
+ # ==============================================================================
+diff --git a/Util/BuildTools/Plugins.sh b/Util/BuildTools/Plugins.sh
+index 94154d04c..fd885f806 100755
+--- a/Util/BuildTools/Plugins.sh
++++ b/Util/BuildTools/Plugins.sh
+@@ -1,3 +1,5 @@
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Parse arguments -----------------------------------------------------------
+ # ==============================================================================
+diff --git a/Util/BuildTools/Prettify.sh b/Util/BuildTools/Prettify.sh
+index 17668ca2e..f20db707a 100755
+--- a/Util/BuildTools/Prettify.sh
++++ b/Util/BuildTools/Prettify.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Set up environment --------------------------------------------------------
+ # ==============================================================================
+diff --git a/Util/BuildTools/Setup.sh b/Util/BuildTools/Setup.sh
+index 9aa65533b..c6f35e7d8 100755
+--- a/Util/BuildTools/Setup.sh
++++ b/Util/BuildTools/Setup.sh
+@@ -1,5 +1,7 @@
+ #! /bin/bash
+ 
++if [[ $VERBOSE = 1 ]]; then set -x; fi
++
+ # ==============================================================================
+ # -- Parse arguments -----------------------------------------------------------
+ # ==============================================================================
+-- 
+2.40.1
+

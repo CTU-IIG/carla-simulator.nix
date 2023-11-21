@@ -1,0 +1,216 @@
+From fd2a9ec5c03f0da76a6d41aa6c3c05461e4ba7ee Mon Sep 17 00:00:00 2001
+From: Michal Sojka <michal.sojka@cvut.cz>
+Date: Tue, 21 Nov 2023 10:29:42 +0100
+Subject: [PATCH 2/2] Allow building CARLA dependencies in my nix-shell
+
+---
+ Util/BuildTools/BuildOSM2ODR.sh   | 14 ++++--------
+ Util/BuildTools/BuildPythonAPI.sh |  4 ----
+ Util/BuildTools/Setup.sh          | 38 ++++++++++++++-----------------
+ 3 files changed, 21 insertions(+), 35 deletions(-)
+
+diff --git a/Util/BuildTools/BuildOSM2ODR.sh b/Util/BuildTools/BuildOSM2ODR.sh
+index 7d16e041e..2220b8274 100755
+--- a/Util/BuildTools/BuildOSM2ODR.sh
++++ b/Util/BuildTools/BuildOSM2ODR.sh
+@@ -92,13 +92,10 @@ if ${BUILD_OSM2ODR} ; then
+   mkdir -p ${OSM2ODR_BUILD_FOLDER}
+   cd ${OSM2ODR_BUILD_FOLDER}
+ 
+-  export CC="$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang"
+-  export CXX="$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang++"
+-  export PATH="$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/bin:$PATH"
+-
+   cmake ${OSM2ODR_SOURCE_FOLDER} \
+       -G "Eclipse CDT4 - Ninja" \
+       -DCMAKE_CXX_FLAGS="-stdlib=libstdc++" \
++      -DCMAKE_PREFIX_PATH="/usr" \
+       -DCMAKE_INSTALL_PREFIX=${LIBCARLA_INSTALL_CLIENT_FOLDER} \
+       -DPROJ_INCLUDE_DIR=${CARLA_BUILD_FOLDER}/proj-install/include \
+       -DPROJ_LIBRARY=${CARLA_BUILD_FOLDER}/proj-install/lib/libproj.a \
+@@ -112,16 +109,15 @@ if ${BUILD_OSM2ODR} ; then
+   cd ${OSM2ODR_SERVER_BUILD_FOLDER}
+ 
+   LLVM_BASENAME=llvm-8.0
+-  LLVM_INCLUDE="$UE4_ROOT/Engine/Source/ThirdParty/Linux/LibCxx/include/c++/v1"
+-  LLVM_LIBPATH="$UE4_ROOT/Engine/Source/ThirdParty/Linux/LibCxx/lib/Linux/x86_64-unknown-linux-gnu"
+ 
+   echo $LLVM_INCLUDE
+   echo $LLVM_LIBPATH
+ 
+   cmake ${OSM2ODR_SOURCE_FOLDER} \
+       -G "Eclipse CDT4 - Ninja" \
+-      -DCMAKE_CXX_FLAGS="-fPIC -std=c++14 -stdlib=libc++ -I${LLVM_INCLUDE} -L${LLVM_LIBPATH}" \
++      -DCMAKE_CXX_FLAGS="-fPIC -std=c++14 -stdlib=libc++ -nostdinc++ -I${LLVM_INCLUDE} -L${LLVM_LIBPATH}" \
+       -DCMAKE_INSTALL_PREFIX=${LIBCARLA_INSTALL_SERVER_FOLDER} \
++      -DCMAKE_PREFIX_PATH="/usr" \
+       -DPROJ_INCLUDE_DIR=${CARLA_BUILD_FOLDER}/proj-install-server/include \
+       -DPROJ_LIBRARY=${CARLA_BUILD_FOLDER}/proj-install-server/lib/libproj.a \
+       -DXercesC_INCLUDE_DIR=${CARLA_BUILD_FOLDER}/xerces-c-3.2.3-install-server/include \
+@@ -134,12 +130,10 @@ if ${BUILD_OSM2ODR} ; then
+   cd ${OSM2ODR_SERVER_BUILD_FOLDER}
+ 
+   LLVM_BASENAME=llvm-8.0
+-  LLVM_INCLUDE="$UE4_ROOT/Engine/Source/ThirdParty/Linux/LibCxx/include/c++/v1"
+-  LLVM_LIBPATH="$UE4_ROOT/Engine/Source/ThirdParty/Linux/LibCxx/lib/Linux/x86_64-unknown-linux-gnu"
+ 
+   cmake ${OSM2ODR_SOURCE_FOLDER} \
+       -G "Eclipse CDT4 - Ninja" \
+-      -DCMAKE_CXX_FLAGS="-fPIC -std=c++14 -stdlib=libc++ -I${LLVM_INCLUDE} -L${LLVM_LIBPATH}" \
++      -DCMAKE_CXX_FLAGS="-fPIC -std=c++14 -stdlib=libc++ -nostdinc++ -I${LLVM_INCLUDE} -L${LLVM_LIBPATH}" \
+       -DCMAKE_INSTALL_PREFIX=${LIBCARLA_INSTALL_SERVER_FOLDER} \
+       -DPROJ_INCLUDE_DIR=${CARLA_BUILD_FOLDER}/proj-install-server/include \
+       -DPROJ_LIBRARY=${CARLA_BUILD_FOLDER}/proj-install-server/lib/libproj.a \
+diff --git a/Util/BuildTools/BuildPythonAPI.sh b/Util/BuildTools/BuildPythonAPI.sh
+index 48107d3b3..cb87494f1 100755
+--- a/Util/BuildTools/BuildPythonAPI.sh
++++ b/Util/BuildTools/BuildPythonAPI.sh
+@@ -51,10 +51,6 @@ while [[ $# -gt 0 ]]; do
+ done
+ 
+ 
+-export CC="$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang"
+-export CXX="$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang++"
+-export PATH="$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/bin:$PATH"
+-
+ source $(dirname "$0")/Environment.sh
+ 
+ if ! { ${REMOVE_INTERMEDIATE} || ${BUILD_PYTHONAPI} ; }; then
+diff --git a/Util/BuildTools/Setup.sh b/Util/BuildTools/Setup.sh
+index c6f35e7d8..5c5df4528 100755
+--- a/Util/BuildTools/Setup.sh
++++ b/Util/BuildTools/Setup.sh
+@@ -2,6 +2,8 @@
+ 
+ if [[ $VERBOSE = 1 ]]; then set -x; fi
+ 
++set -e
++
+ # ==============================================================================
+ # -- Parse arguments -----------------------------------------------------------
+ # ==============================================================================
+@@ -49,10 +51,6 @@ done
+ 
+ source $(dirname "$0")/Environment.sh
+ 
+-export CC="$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang"
+-export CXX="$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/bin/clang++"
+-export PATH="$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/bin:$PATH"
+-
+ CXX_TAG=c10
+ 
+ # Convert comma-separated string to array of unique elements.
+@@ -61,10 +59,6 @@ IFS="," read -r -a PY_VERSION_LIST <<< "${PY_VERSION_LIST}"
+ mkdir -p ${CARLA_BUILD_FOLDER}
+ pushd ${CARLA_BUILD_FOLDER} >/dev/null
+ 
+-LLVM_INCLUDE="$UE4_ROOT/Engine/Source/ThirdParty/Linux/LibCxx/include/c++/v1"
+-LLVM_LIBPATH="$UE4_ROOT/Engine/Source/ThirdParty/Linux/LibCxx/lib/Linux/x86_64-unknown-linux-gnu"
+-UNREAL_HOSTED_CFLAGS="--sysroot=$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu/"
+-
+ # ==============================================================================
+ # -- Get boost includes --------------------------------------------------------
+ # ==============================================================================
+@@ -180,7 +174,7 @@ else
+   pushd ${RPCLIB_BASENAME}-libcxx-build >/dev/null
+ 
+   cmake -G "Ninja" \
+-      -DCMAKE_CXX_FLAGS="-fPIC -std=c++14 -stdlib=libc++ -I${LLVM_INCLUDE} -Wl,-L${LLVM_LIBPATH} -DBOOST_NO_EXCEPTIONS -DASIO_NO_EXCEPTIONS ${UNREAL_HOSTED_CFLAGS}" \
++      -DCMAKE_CXX_FLAGS="-fPIC -std=c++14 -stdlib=libc++ -nostdinc++ -I${LLVM_INCLUDE} -Wl,-L${LLVM_LIBPATH} -DBOOST_NO_EXCEPTIONS -DASIO_NO_EXCEPTIONS ${UNREAL_HOSTED_CFLAGS}" \
+       -DCMAKE_INSTALL_PREFIX="../${RPCLIB_BASENAME}-libcxx-install" \
+       ../${RPCLIB_BASENAME}-source
+ 
+@@ -221,9 +215,9 @@ GTEST_VERSION=1.8.1
+ GTEST_BASENAME=gtest-${GTEST_VERSION}-${CXX_TAG}
+ 
+ GTEST_LIBCXX_INCLUDE=${PWD}/${GTEST_BASENAME}-libcxx-install/include
+-GTEST_LIBCXX_LIBPATH=${PWD}/${GTEST_BASENAME}-libcxx-install/lib
++GTEST_LIBCXX_LIBPATH=${PWD}/${GTEST_BASENAME}-libcxx-install/lib64
+ GTEST_LIBSTDCXX_INCLUDE=${PWD}/${GTEST_BASENAME}-libstdcxx-install/include
+-GTEST_LIBSTDCXX_LIBPATH=${PWD}/${GTEST_BASENAME}-libstdcxx-install/lib
++GTEST_LIBSTDCXX_LIBPATH=${PWD}/${GTEST_BASENAME}-libstdcxx-install/lib64
+ 
+ if [[ -d "${GTEST_BASENAME}-libcxx-install" && -d "${GTEST_BASENAME}-libstdcxx-install" ]] ; then
+   log "${GTEST_BASENAME} already installed."
+@@ -244,7 +238,7 @@ else
+   pushd ${GTEST_BASENAME}-libcxx-build >/dev/null
+ 
+   cmake -G "Ninja" \
+-      -DCMAKE_CXX_FLAGS="-std=c++14 -stdlib=libc++ -I${LLVM_INCLUDE} -Wl,-L${LLVM_LIBPATH} -DBOOST_NO_EXCEPTIONS -fno-exceptions ${UNREAL_HOSTED_CFLAGS}" \
++      -DCMAKE_CXX_FLAGS="-std=c++14 -stdlib=libc++ -nostdinc++ -I${LLVM_INCLUDE} -Wl,-L${LLVM_LIBPATH}  -DBOOST_NO_EXCEPTIONS -fno-exceptions ${UNREAL_HOSTED_CFLAGS}" \
+       -DCMAKE_INSTALL_PREFIX="../${GTEST_BASENAME}-libcxx-install" \
+       ../${GTEST_BASENAME}-source
+ 
+@@ -382,8 +376,8 @@ XERCESC_REPO=https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCE
+ XERCESC_SRC_DIR=${XERCESC_BASENAME}-source
+ XERCESC_INSTALL_DIR=${XERCESC_BASENAME}-install
+ XERCESC_INSTALL_SERVER_DIR=${XERCESC_BASENAME}-install-server
+-XERCESC_LIB=${XERCESC_INSTALL_DIR}/lib/libxerces-c.a
+-XERCESC_SERVER_LIB=${XERCESC_INSTALL_SERVER_DIR}/lib/libxerces-c.a
++XERCESC_LIB=${XERCESC_INSTALL_DIR}/lib64/libxerces-c.a
++XERCESC_SERVER_LIB=${XERCESC_INSTALL_SERVER_DIR}/lib64/libxerces-c.a
+ 
+ if [[ -d ${XERCESC_INSTALL_DIR} &&  -d ${XERCESC_INSTALL_SERVER_DIR} ]] ; then
+   log "Xerces-c already installed."
+@@ -399,7 +393,7 @@ else
+ 
+   log "Extracting xerces-c."
+   tar -xzf ${XERCESC_BASENAME}.tar.gz
+-  mv ${XERCESC_BASENAME} ${XERCESC_SRC_DIR}
++  mv -T -n ${XERCESC_BASENAME} ${XERCESC_SRC_DIR}
+   mkdir -p ${XERCESC_INSTALL_DIR}
+   mkdir -p ${XERCESC_SRC_DIR}/build
+ 
+@@ -422,8 +416,10 @@ else
+ 
+   pushd ${XERCESC_SRC_DIR}/build >/dev/null
+ 
++#      -DCMAKE_CXX_FLAGS="-std=c++14 -fPIC -w -I${LLVM_INCLUDE} -L${LLVM_LIBPATH} -lc++ -lc++abi" \
++  # See https://releases.llvm.org/10.0.0/projects/libcxx/docs/UsingLibcxx.html#id1
+   cmake -G "Ninja" \
+-      -DCMAKE_CXX_FLAGS="-std=c++14 -stdlib=libc++ -fPIC -w -I${LLVM_INCLUDE} -L${LLVM_LIBPATH}" \
++      -DCMAKE_CXX_FLAGS="-std=c++14 -stdlib=libc++ -nostdinc++ -fPIC -w -I${LLVM_INCLUDE} -L${LLVM_LIBPATH} -Wl,-rpath,${LLVM_LIBPATH} -lc++abi" \
+       -DCMAKE_INSTALL_PREFIX="../../${XERCESC_INSTALL_SERVER_DIR}" \
+       -DCMAKE_BUILD_TYPE=Release \
+       -DBUILD_SHARED_LIBS=OFF \
+@@ -535,7 +531,7 @@ if ${USE_CHRONO} ; then
+     pushd ${CHRONO_SRC_DIR}/build >/dev/null
+ 
+     cmake -G "Ninja" \
+-        -DCMAKE_CXX_FLAGS="-fPIC -std=c++14 -stdlib=libc++ -I${LLVM_INCLUDE} -L${LLVM_LIBPATH} -Wno-unused-command-line-argument ${UNREAL_HOSTED_CFLAGS}" \
++        -DCMAKE_CXX_FLAGS="-fPIC -std=c++14 -stdlib=libc++ -nostdinc++ -I${LLVM_INCLUDE} -L${LLVM_LIBPATH} -Wno-unused-command-line-argument ${UNREAL_HOSTED_CFLAGS}" \
+         -DEIGEN3_INCLUDE_DIR="../../${EIGEN_INCLUDE}" \
+         -DCMAKE_INSTALL_PREFIX="../../${CHRONO_INSTALL_DIR}" \
+         -DCMAKE_BUILD_TYPE=Release \
+@@ -615,8 +611,8 @@ PROJ_INSTALL_DIR=proj-install
+ PROJ_INSTALL_SERVER_DIR=proj-install-server
+ PROJ_INSTALL_DIR_FULL=${PWD}/${PROJ_INSTALL_DIR}
+ PROJ_INSTALL_SERVER_DIR_FULL=${PWD}/${PROJ_INSTALL_SERVER_DIR}
+-PROJ_LIB=${PROJ_INSTALL_DIR_FULL}/lib/libproj.a
+-PROJ_SERVER_LIB=${PROJ_INSTALL_SERVER_DIR_FULL}/lib/libproj.a
++PROJ_LIB=${PROJ_INSTALL_DIR_FULL}/lib64/libproj.a
++PROJ_SERVER_LIB=${PROJ_INSTALL_SERVER_DIR_FULL}/lib64/libproj.a
+ 
+ if [[ -d ${PROJ_INSTALL_DIR} && -d ${PROJ_INSTALL_SERVER_DIR_FULL} ]] ; then
+   log "PROJ already installed."
+@@ -652,7 +648,7 @@ else
+   pushd ${PROJ_SRC_DIR}/build >/dev/null
+ 
+   cmake -G "Ninja" .. \
+-      -DCMAKE_CXX_FLAGS="-std=c++14 -fPIC -stdlib=libc++ -I${LLVM_INCLUDE} -Wl,-L${LLVM_LIBPATH}"  \
++      -DCMAKE_CXX_FLAGS="-std=c++14 -fPIC -stdlib=libc++ -nostdinc++ -I${LLVM_INCLUDE} -Wl,-L${LLVM_LIBPATH}"  \
+       -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB} \
+       -DEXE_SQLITE3=${SQLITE_EXE} \
+       -DENABLE_TIFF=OFF -DENABLE_CURL=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_PROJSYNC=OFF \
+@@ -921,7 +917,7 @@ cp ${LIBSTDCPP_TOOLCHAIN_FILE}.gen ${LIBCPP_TOOLCHAIN_FILE}.gen
+ 
+ cat >>${LIBCPP_TOOLCHAIN_FILE}.gen <<EOL
+ 
+-set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} -stdlib=libc++" CACHE STRING "" FORCE)
++set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} -stdlib=libc++ -nostdinc++" CACHE STRING "" FORCE)
+ set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} -isystem ${LLVM_INCLUDE} ${UNREAL_HOSTED_CFLAGS}" CACHE STRING "" FORCE)
+ set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} -fno-exceptions" CACHE STRING "" FORCE)
+ set(CMAKE_CXX_LINK_FLAGS "\${CMAKE_CXX_LINK_FLAGS} -L${LLVM_LIBPATH} ${UNREAL_HOSTED_CFLAGS}" CACHE STRING "" FORCE)
+-- 
+2.40.1
+
