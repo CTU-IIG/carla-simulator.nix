@@ -41,7 +41,7 @@
         builtins.listToAttrs
           (concatMap (version:
             map (name: {
-              name = "${name}-${version}";
+              name = "${name}-${builtins.replaceStrings ["."] ["_"] version}";
               value = (import nixpkgs {
                 system = "x86_64-linux";
                 overlays = [ self.overlays.${version} ];
