@@ -1,0 +1,3 @@
+builds:
+  exclude:
+    - packages.x86_64-linux.ue4 # unfree
