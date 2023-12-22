@@ -146,8 +146,8 @@ like this:
 ### `packages`
 
 The `packages` output contains CARLA binary releases as well as the
-packages from the latest overlay applied to a random nixpkgs version
-(locked in `flake.lock`).
+packages from all CARLA version overlays applied to a random nixpkgs
+version (locked in `flake.lock`).
 
 Use these, for example, to run or install the packages on your
 computer, e.g.:
