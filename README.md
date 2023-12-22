@@ -84,7 +84,7 @@ The outputs are documented in more detail below. Unfinished
 To quickly try CARLA Python bindings from this repository, execute
 CARLA (e.g. via [a package in this repo](#packages)) and then run:
 
-    nix develop .#carla-py
+    nix develop .#carla-py-0_9_14
     cd <CARLA_SOURCES>/PythonAPI/examples
     ./manual_control.py
 
@@ -127,8 +127,8 @@ packages from the latest overlay applied to a random nixpkgs version
 Use these, for example, to run or install the packages on your
 computer, e.g.:
 
-- `nix run github:CTU-IIG/carla-simulator.nix#carla-bin_0_9_14`
-- `nix profile install github:CTU-IIG/carla-simulator.nix#scenic`
+- `nix run github:CTU-IIG/carla-simulator.nix#carla-bin-0_9_14`
+- `nix profile install github:CTU-IIG/carla-simulator.nix#scenic-0_9_14`
 
 ## TODO
 
