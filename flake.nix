@@ -72,7 +72,7 @@
           name = "Shell for building CARLA C++ examples";
           packages = [
             pkgs.bashInteractive
-            self.packages.x86_64-linux."libcarla-client-${lastVersion}"
+            self.packages.x86_64-linux."libcarla-client-${builtins.replaceStrings ["."] ["_"] lastVersion}"
             pkgs.libpng
             pkgs.libjpeg
             pkgs.libtiff
