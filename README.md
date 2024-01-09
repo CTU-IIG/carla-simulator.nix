@@ -5,8 +5,15 @@
 To use this repository, you have to [install Nix][].
 
 The repository contains a [Nix flake][] with the CARLA simulator and
-related tools. Its content is as follows:
+related tools. An easy way to test it to run:
 
+    nix run github:CTU-IIG/carla-simulator.nix#carla-bin-0_9_15
+
+and in another terminal:
+
+    nix shell github:CTU-IIG/carla-simulator.nix#carla-py-scripts-0_9_15 --command carla-example-manual_control.py
+
+The full content of the flake is:
 <!-- `$ nix flake show | sed -e '1ccarla-simulator.nix'` -->
 ```
 carla-simulator.nix
