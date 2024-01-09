@@ -190,7 +190,3 @@ Feel free to contact us by submitting [issues][].
 [Scenic]: https://github.com/BerkeleyLearnVerify/Scenic
 [Nixpkgs overlays]: https://nixos.wiki/wiki/Overlays
 [issues]: https://github.com/CTU-IIG/carla-simulator.nix/issues
-
-<!-- Local Variables: -->
-<!-- compile-command: "mdsh" -->
-<!-- End: -->
