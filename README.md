@@ -171,6 +171,33 @@ version as your system (this is for compatibility with your system's
 
 On non-NixOS systems, you may also need to use [NixGL][].
 
+#### carla-bin.withAssets
+
+Packages `carla-bin-*` can be extended by custom assets such as
+additional maps and/or vehicles. You can use `carla-bin.withAssets`
+function for that. The `assets` parameter should be a list of
+tarballs, zip files or derivations with assets. Using derivations has
+the advantage that the same asset can be reused in multiple versions
+of CARLA without consuming additional storage space.
+
+See the following example (try it with `nix repl` and `:lf .`):
+```nix
+let
+  pkgs = import inputs.nixpkgs {};
+  carla-bin = packages.x86_64-linux.carla-bin-0_9_15;
+  maps = pkgs.fetchurl {
+    url = "https://carla-releases.s3.us-east-005.backblazeb2.com/Windows/AdditionalMaps_0.9.15.zip";
+    hash = "sha256-3w6K/5+xGBXJgPtu4Yt6SdGTCts6PGErsuaishpO6Xg=";
+  };
+  maps-derivation = pkgs.runCommand "carla-maps" {
+    nativeBuildInputs = [ pkgs.unzip ];
+  } ''mkdir $out && cd $out && unzip ${maps}'';
+in {
+  carla-with-maps = carla-bin.withAssets [ maps ];
+  carla-with-maps2 = carla-bin.withAssets [ maps-derivation ];
+}
+```
+
 ## TODO
 
 We wanted to build Carla and Unreal Engine from source via Nix.
