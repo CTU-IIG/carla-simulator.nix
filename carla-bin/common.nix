@@ -33,40 +33,41 @@ let
     xorg.libXxf86vm
     vulkan-loader
   ];
-in
-stdenv.mkDerivation rec {
-  pname = "carla-bin";
-  inherit version;
-  src = fetchurl {
-    url = "https://carla-releases.s3.eu-west-3.amazonaws.com/Linux/CARLA_${version}.tar.gz";
-    sha256 = src-hash;
+  carla = stdenv.mkDerivation rec {
+    pname = "carla-bin";
+    inherit version;
+    src = fetchurl {
+      url = "https://carla-releases.s3.eu-west-3.amazonaws.com/Linux/CARLA_${version}.tar.gz";
+      sha256 = src-hash;
+    };
+
+    nativeBuildInputs = [
+      pigz
+      patchelf
+    ];
+    buildInputs = [
+      autoPatchelfHook
+      makeWrapper
+      llvmPackages_8.openmp
+      libusb1
+      zlib
+    ];
+
+    dontUnpack = true;
+      installPhase = ''
+      mkdir -p $out
+      cd $out
+      pigz -dc $src | tar xf -
+    '';
+
+    postFixup = ''
+      for i in libChronoModels_robot.so libChronoEngine_vehicle.so libChronoEngine.so libChronoModels_vehicle.so; do
+        patchelf --replace-needed libomp.so.5 libomp.so $out/CarlaUE4/Plugins/Carla/CarlaDependencies/lib/$i
+      done
+      makeWrapper $out/CarlaUE4.sh $out/bin/CarlaUE4.sh --prefix LD_LIBRARY_PATH : '${lib.makeLibraryPath extraLibs}'
+    '';
+
+    meta.mainProgram = "CarlaUE4.sh";
   };
-
-  nativeBuildInputs = [
-    pigz
-    patchelf
-  ];
-  buildInputs = [
-    autoPatchelfHook
-    makeWrapper
-    llvmPackages_8.openmp
-    libusb1
-    zlib
-  ];
-
-  dontUnpack = true;
-  installPhase = ''
-    mkdir -p $out
-    cd $out
-    pigz -dc $src | tar xf -
-  '';
-
-  postFixup = ''
-    for i in libChronoModels_robot.so libChronoEngine_vehicle.so libChronoEngine.so libChronoModels_vehicle.so; do
-      patchelf --replace-needed libomp.so.5 libomp.so $out/CarlaUE4/Plugins/Carla/CarlaDependencies/lib/$i
-    done
-    makeWrapper $out/CarlaUE4.sh $out/bin/CarlaUE4.sh --prefix LD_LIBRARY_PATH : '${lib.makeLibraryPath extraLibs}'
-  '';
-
-  meta.mainProgram = "CarlaUE4.sh";
-}
+in
+carla
