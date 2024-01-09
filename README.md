@@ -155,7 +155,7 @@ computer, e.g.:
 - `nix run github:CTU-IIG/carla-simulator.nix#carla-bin-0_9_14`
 - `nix profile install github:CTU-IIG/carla-simulator.nix#scenic-0_9_14`
 
-If CARLA doesn't fails to display anything using the command above,
+If CARLA fails to display anything using the command above,
 you may need override flake's `nixpkgs` input to use the same glibc
 version as your system (this is for compatibility with your system's
 `libvulkan` etc.). For example:
