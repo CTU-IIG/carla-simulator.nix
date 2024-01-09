@@ -64,7 +64,9 @@ let
       for i in libChronoModels_robot.so libChronoEngine_vehicle.so libChronoEngine.so libChronoModels_vehicle.so; do
         patchelf --replace-needed libomp.so.5 libomp.so $out/CarlaUE4/Plugins/Carla/CarlaDependencies/lib/$i
       done
-      makeWrapper $out/CarlaUE4.sh $out/bin/CarlaUE4.sh --prefix LD_LIBRARY_PATH : '${lib.makeLibraryPath extraLibs}'
+      makeWrapper $out/CarlaUE4/Binaries/Linux/CarlaUE4-Linux-Shipping $out/bin/CarlaUE4.sh \
+        --prefix LD_LIBRARY_PATH : '${lib.makeLibraryPath extraLibs}' \
+        --add-flags CarlaUE4
     '';
 
     meta.mainProgram = "CarlaUE4.sh";
