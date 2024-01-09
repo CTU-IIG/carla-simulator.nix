@@ -7,10 +7,5 @@ let
     "0.9.15" = "sha256-ey9DLOdLJRWT+V3Mje5tma2WJcKnGi1tSPJNh53hnvc=";
   };
   carla = version: src-hash: pkgs.callPackage (import ./common.nix { inherit version src-hash; }) {};
-  # A wrapper, which has CarlaUE4.sh in /bin rather than in /.
-  carla-wrapper = carla: pkgs.writeShellScriptBin "CarlaUE4.sh" ''
-    exec ${carla}/CarlaUE4.sh "$@"
-  '';
-  wrap-carla = version: src-hash: carla-wrapper (carla version src-hash);
 in
-builtins.mapAttrs (version: hash: wrap-carla version hash) hashes
+builtins.mapAttrs carla hashes
