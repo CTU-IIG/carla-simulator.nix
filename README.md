@@ -91,7 +91,7 @@ The outputs are documented in more detail below. Unfinished
 To quickly try CARLA Python bindings from this repository, execute
 CARLA (e.g. via [a package in this repo](#packages)) and then run:
 
-    nix develop .#carla-py-0_9_14
+    nix develop .#carla-py
     cd <CARLA_SOURCES>/PythonAPI/examples
     ./manual_control.py
 
