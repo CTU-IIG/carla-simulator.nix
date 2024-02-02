@@ -79,8 +79,9 @@
           ];
         };
       };
-      checks.x86_64-linux.ci =
-        pkgs.linkFarm "carla-all"
+      checks.x86_64-linux = {
+        ci = pkgs.linkFarm "carla-all"
           (builtins.removeAttrs self.packages.x86_64-linux [ "ue4" ]);
+      };
     };
 }
