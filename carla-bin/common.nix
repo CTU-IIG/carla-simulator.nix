@@ -131,6 +131,7 @@ let
         cp {${carla},$out}/CarlaUE4/Binaries/Linux/CarlaUE4-Linux-Shipping
         ${wrapCarlaUE4}
       '';
+      meta.mainProgram = "CarlaUE4.sh";
     };
   };
 in
