@@ -185,16 +185,14 @@ See the following example (try it with `nix repl` and `:lf .`):
 let
   pkgs = import inputs.nixpkgs {};
   carla-bin = packages.x86_64-linux.carla-bin-0_9_15;
-  maps = pkgs.fetchurl {
-    url = "https://carla-releases.s3.us-east-005.backblazeb2.com/Windows/AdditionalMaps_0.9.15.zip";
-    hash = "sha256-3w6K/5+xGBXJgPtu4Yt6SdGTCts6PGErsuaishpO6Xg=";
+  maps-tar = pkgs.fetchurl {
+    url = "https://carla-releases.s3.us-east-005.backblazeb2.com/Linux/AdditionalMaps_0.9.15.tar.gz";
+    sha256 = "0hz11k26jp2rm9xfh9z6n5g53y799hzab5hz69x0y9j6rs04xbac";
   };
-  maps-derivation = pkgs.runCommand "carla-maps" {
-    nativeBuildInputs = [ pkgs.unzip ];
-  } ''mkdir $out && cd $out && unzip ${maps}'';
+  maps = pkgs.runCommand "carla-maps" { } ''mkdir $out && cd $out && tar xf ${maps-tar}'';
 in {
-  carla-with-maps = carla-bin.withAssets [ maps ];
-  carla-with-maps2 = carla-bin.withAssets [ maps-derivation ];
+  carla-with-maps = carla-bin.withAssets [ maps-tar ];
+  carla-with-maps2 = carla-bin.withAssets [ maps ];
 }
 ```
 

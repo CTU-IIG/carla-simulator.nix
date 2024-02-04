@@ -80,18 +80,16 @@
         };
       };
       checks.x86_64-linux = let
-        maps = pkgs.fetchurl {
-          url = "https://carla-releases.s3.us-east-005.backblazeb2.com/Windows/AdditionalMaps_0.9.15.zip";
-          hash = "sha256-3w6K/5+xGBXJgPtu4Yt6SdGTCts6PGErsuaishpO6Xg=";
+        maps-tar = pkgs.fetchurl {
+          url = "https://carla-releases.s3.us-east-005.backblazeb2.com/Linux/AdditionalMaps_0.9.15.tar.gz";
+          sha256 = "0hz11k26jp2rm9xfh9z6n5g53y799hzab5hz69x0y9j6rs04xbac";
         };
-        maps-derivation = pkgs.runCommand "carla-maps" {
-          nativeBuildInputs = [ pkgs.unzip ];
-        } ''mkdir $out && cd $out && unzip ${maps}'';
+        maps = pkgs.runCommand "carla-maps" { } ''mkdir $out && cd $out && tar xf ${maps-tar}'';
       in {
         ci = pkgs.linkFarm "carla-all"
           (builtins.removeAttrs self.packages.x86_64-linux [ "ue4" ]);
-        carla-with-maps = self.packages.x86_64-linux.carla-bin-0_9_15.withAssets [ maps ];
-        carla-with-maps-derivation = self.packages.x86_64-linux.carla-bin-0_9_15.withAssets [ maps-derivation ];
+        carla-with-maps = self.packages.x86_64-linux.carla-bin-0_9_15.withAssets [ maps-tar ];
+        carla-with-maps-derivation = self.packages.x86_64-linux.carla-bin-0_9_15.withAssets [ maps ];
       };
     };
 }
