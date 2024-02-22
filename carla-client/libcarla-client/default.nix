@@ -17,7 +17,10 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ boost rpclib recast ];
-  patches = [ ./carla_client.patch ];
+  patches = [
+    ./carla_client.patch
+    ./libcarla-Fix-compile-error-with-gcc-13.patch
+  ];
   cmakeFlags = [
     "../cmake"
     "-DCMAKE_BUILD_TYPE=Client"

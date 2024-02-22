@@ -1,0 +1,29 @@
+From 624dbaf40cb19c0ef56353d6b281034033b8f011 Mon Sep 17 00:00:00 2001
+From: Michal Sojka <michal.sojka@cvut.cz>
+Date: Thu, 22 Feb 2024 13:20:05 +0100
+Subject: [PATCH] libcarla: Fix compile error with gcc >=13
+
+The error was:
+
+    LibCarla/source/carla/client/FileTransfer.h:31:57: error: 'uint8_t' was not declared in this scope
+       31 |     static bool WriteFile(std::string path, std::vector<uint8_t> content);
+          |                                                         ^~~~~~~
+---
+ LibCarla/source/carla/client/FileTransfer.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/LibCarla/source/carla/client/FileTransfer.h b/LibCarla/source/carla/client/FileTransfer.h
+index fd1c09162..8bfa00ca1 100644
+--- a/source/carla/client/FileTransfer.h
++++ b/source/carla/client/FileTransfer.h
+@@ -12,6 +12,7 @@
+ #include <iostream>
+ #include <string>
+ #include <sys/stat.h>
++#include <cstdint>
+ 
+ namespace carla {
+ namespace client {
+-- 
+2.43.0
+
