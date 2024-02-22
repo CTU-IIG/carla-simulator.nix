@@ -17,6 +17,12 @@ python3Packages.buildPythonPackage rec {
   # cannot have different version in a single Python process).
   postPatch = ''
     substituteInPlace pyproject.toml --replace 'shapely ~= 1.7' 'shapely ~= 2.0'
+  '' ++
+  # Nixpkgs recently added pythonRuntimeDepsCheckHook, which complains
+  # about pillow 10.* incompatibility. I'm not sure whether the
+  # following workaround is sufficient. Somebody has to test it.
+  ''
+    substituteInPlace pyproject.toml --replace 'pillow ~= 9.1' 'pillow >= 9.1, <11'
   '';
 
   propagatedBuildInputs = with python3Packages; [
