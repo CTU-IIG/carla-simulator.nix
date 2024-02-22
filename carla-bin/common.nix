@@ -7,7 +7,7 @@
 , libglvnd
 , libusb1
 , libxkbcommon
-, llvmPackages_8
+, llvmPackages_9
 , makeWrapper
 , patchelf
 , pigz
@@ -57,7 +57,7 @@ let
     buildInputs = [
       autoPatchelfHook
       makeWrapper
-      llvmPackages_8.openmp
+      llvmPackages_9.openmp
       libusb1
       zlib
     ];
