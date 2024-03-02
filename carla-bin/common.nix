@@ -46,7 +46,7 @@ let
     pname = "carla-bin";
     inherit version;
     src = fetchurl {
-      url = "https://carla-releases.s3.eu-west-3.amazonaws.com/Linux/CARLA_${version}.tar.gz";
+      url = "https://carla-releases.s3.us-east-005.backblazeb2.com/Linux/CARLA_${version}.tar.gz";
       sha256 = src-hash;
     };
 
