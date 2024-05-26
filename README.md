@@ -5,7 +5,7 @@
 To use this repository, you have to [install Nix][].
 
 The repository contains a [Nix flake][] with the CARLA simulator and
-related tools. An easy way to test it to run:
+related tools. An easy way to test it is to run:
 
     nix run github:CTU-IIG/carla-simulator.nix#carla-bin-0_9_15
 
