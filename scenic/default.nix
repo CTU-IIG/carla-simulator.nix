@@ -16,7 +16,9 @@ python3Packages.buildPythonPackage rec {
   # Otherwise, we have collisions (carla uses shapely too and we
   # cannot have different version in a single Python process).
   postPatch = ''
-    substituteInPlace pyproject.toml --replace 'shapely ~= 1.7' 'shapely ~= 2.0'
+    substituteInPlace pyproject.toml \
+      --replace-fail 'shapely ~= 1.7' 'shapely ~= 2.0' \
+      --replace-fail 'pillow ~= 9.1' 'pillow ~= 10.3'
   '';
 
   propagatedBuildInputs = with python3Packages; [
