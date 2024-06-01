@@ -82,7 +82,7 @@
       checks.x86_64-linux = let
         maps-tar = pkgs.fetchurl {
           url = "https://carla-releases.s3.us-east-005.backblazeb2.com/Linux/AdditionalMaps_0.9.15.tar.gz";
-          sha256 = "0hz11k26jp2rm9xfh9z6n5g53y799hzab5hz69x0y9j6rs04xbac";
+          hash = "sha256-Sdt40U/vH0A/af4aE/HxgC8hEabZgWGCayrg1t2Wu6g=";
         };
         maps = pkgs.runCommand "carla-maps" { } ''mkdir $out && cd $out && tar xf ${maps-tar}'';
       in {
