@@ -1,7 +1,7 @@
 { pkgs ? import <nixpkgs> {} }:
 with pkgs;
 (buildFHSEnv {
-  pname = "carla-build";
+  name = "carla-build";
   targetPkgs = pkgs: with pkgs; [
     # Unreal Engine
     #mono
@@ -34,7 +34,7 @@ with pkgs;
     autoconf
     automake
     rsync
-    #llvmPackages_10.libcxx llvmPackages_10.libcxxabi
+    #llvmPackages_12.libcxx llvmPackages_12.libcxxabi
   ];
 
   # Currently, we rely on nix-ld (https://github.com/Mic92/nix-ld) to
@@ -59,23 +59,23 @@ with pkgs;
     sysroot = pkgs.buildEnv {
       name = "carla-sysroot";
       paths = [
-        pkgs.llvmPackages_10.libcxx
-        pkgs.llvmPackages_10.libcxx.dev
-        pkgs.llvmPackages_10.libcxxabi
-        #pkgs.llvmPackages_10.libcxxabi.dev
-        pkgs.llvmPackages_10.compiler-rt
-        #pkgs.llvmPackages_10.compiler-rt.dev
+        pkgs.llvmPackages_12.libcxx
+        pkgs.llvmPackages_12.libcxx.dev
+        #pkgs.llvmPackages_12.libcxxabi # merged into libcxx
+        #pkgs.llvmPackages_12.libcxxabi.dev
+        pkgs.llvmPackages_12.compiler-rt
+        #pkgs.llvmPackages_12.compiler-rt.dev
       ];
     };
   in ''
     export UE4_ROOT=~/src/carla/nix/build-env/UnrealEngine_4.26
     cd ~/src/carla/carla
-    # sed -i -e s,\$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu,${pkgs.llvmPackages_10.clang}, \
+    # sed -i -e s,\$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu,${pkgs.llvmPackages_12.clang}, \
     #   Util/BuildTools/*.sh
 
-    export CC="${pkgs.llvmPackages_10.clang}/bin/clang"
-    export CXX="${pkgs.llvmPackages_10.clang}/bin/clang++"
-    export PATH="${pkgs.llvmPackages_10.clang}/bin:$PATH"
+    export CC="${pkgs.llvmPackages_12.clang}/bin/clang"
+    export CXX="${pkgs.llvmPackages_12.clang}/bin/clang++"
+    export PATH="${pkgs.llvmPackages_12.clang}/bin:$PATH"
 
     export LLVM_INCLUDE=${sysroot}/include/c++/v1
     export LLVM_LIBPATH=${sysroot}/lib
