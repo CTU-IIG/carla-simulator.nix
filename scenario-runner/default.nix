@@ -35,14 +35,14 @@ let
 in
 python3Packages.buildPythonPackage rec {
   pname = "scenario-runner";
-  version = "0.9.13";
+  version = "0.9.15+dev";
   format = "other";
 
   src = fetchFromGitHub {
     owner = "carla-simulator";
     repo = "scenario_runner";
-    rev = "v${version}";
-    hash = "sha256-48cN/l5cQOLwEN9lueZDgGJvhn0aVsZeBfxWXJ0x3S0=";
+    rev = "7758d066080f180f8296887ed89b7c723a54706a"; #"v${version}";
+    hash = "sha256-lRcq0bI/ZDRugiThH3nSYNvx5Aep76BwPo719LLVPlQ=";
   };
 
   buildInputs = [
@@ -63,6 +63,8 @@ python3Packages.buildPythonPackage rec {
     matplotlib
     six
     simple-watchdog-timer
+    graphviz
+    antlr4-python3-runtime
 
     # for manual_control.py
     pygame
