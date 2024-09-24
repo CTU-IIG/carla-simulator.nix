@@ -18,27 +18,26 @@ let
   ade = rec {
     src = fetchurl {
       url = "https://github.com/opencv/ade/archive/${name}";
-      sha256 = "sha256-TjLRbFbC7MDY9PxIy560ryviBI58cbQwqgc7A7uOHkg=";
+      hash = "sha256-WG/GudVpkO10kOJhoKXFMj672kggvyRYCIpezal3wcE=";
     };
-    name = "v0.1.2a.zip";
-    md5 = "fa4b3e25167319cb0fa9432ef8281945";
+    name = "v0.1.2d.zip";
+    md5 = "dbb095a8bf3008e91edbbf45d8d34885";
     dst = ".cache/ade";
   };
 in
 python3Packages.buildPythonPackage rec {
   pname = "opencv-python";
-  version = "4.8.1.78";
+  version = "4.9.0.80";
   format = "pyproject";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-zHrbvNERKHejknQQbLJ1LgSYS8AaAxFilS6XRQ1hF/Y=";
+    hash = "sha256-Gp8OYmfeOhodsMVCE9Aix8i1ucpLWA6AvcWFFskiyeE=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
       --replace 'setuptools==59.2.0' 'setuptools' \
-      --replace 'numpy==1.21.2' 'numpy' \
       --replace 'numpy==1.22.2' 'numpy'
   '';
 
