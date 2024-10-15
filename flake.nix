@@ -73,6 +73,7 @@
           packages = [
             pkgs.bashInteractive
             self.packages.x86_64-linux."libcarla-client-${builtins.replaceStrings ["."] ["_"] lastVersion}"
+            pkgs.cmake
             pkgs.libpng
             pkgs.libjpeg
             pkgs.libtiff
