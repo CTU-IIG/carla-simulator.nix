@@ -3,17 +3,16 @@
 , boost
 , rpclib
 , recast
-, fetchFromGitHub
 , carla-src
 , enableDebug ? false
+, runCommandLocal
 }:
 
 stdenv.mkDerivation rec {
   pname = "libcarla-client";
   version = carla-src.meta.version;
 
-  src = carla-src;
-  prePatch = "cd LibCarla";
+  src = runCommandLocal "LibCarla-copy" { } "cp -aT ${carla-src}/LibCarla/ $out";
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ boost rpclib recast ];
