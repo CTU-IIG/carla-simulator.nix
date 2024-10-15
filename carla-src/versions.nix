@@ -13,7 +13,5 @@ in
 ) hashes)
 // {
   # TODO: Update the path below to where you have CARLA sources
-  "local" = { runCommandLocal }: runCommandLocal "source" { meta.version = "0.9.15-local"; } ''
-    cp -a ${/home/wsh/src/carla/carla} $out
-  '';
+  "local" = _: (fetchTree { type = "git"; url = "/home/wsh/src/carla/carla"; }) // { meta.version = "0.9.15"; };
 }
