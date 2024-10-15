@@ -10,6 +10,7 @@
 , osm2odr
 , carla-src
 , lib
+, enableDebug ? false
 }:
 
 python3Packages.buildPythonPackage rec {
@@ -21,10 +22,13 @@ python3Packages.buildPythonPackage rec {
 #   src = /home/wsh/src/carla/carla;
 #   sourceRoot = "carla/PythonAPI/carla";
 
-  separateDebugInfo = true;
+  separateDebugInfo = !enableDebug;
+  # sepaseparateDebugInfo is not sufficient to get debug info in
+  # backtraces. Not sure why.
+  dontStrip = enableDebug;
 
   buildInputs = [
-    libcarla-client
+    (libcarla-client.override { inherit enableDebug; })
     libjpeg.dev
     libpng.dev
     libtiff.dev
