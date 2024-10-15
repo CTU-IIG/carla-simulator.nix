@@ -19,6 +19,13 @@ stdenv.mkDerivation rec {
   patches = [
     ./carla_client.patch
     ./libcarla-Fix-compile-error-with-gcc-13.patch
+    # Work around a segfault (and warn about the problem). The problem seems
+    # to be related to the incorrect content of a map cache, e.g.:
+    # CarlaUE4/Content/map_package/Maps/bdsc_export/TM/bdsc_export.bin.
+    # Deleting this file removes the segfaults, but the following is printed:
+    # "WARNING: No InMemoryMap cache found. Setting up local map. This may
+    # take a while...". The time seems to be short for our maps.
+    ./work-around-segfaults-in-the-traffic-manager.patch
   ];
   cmakeFlags = [
     "../cmake"

@@ -1,0 +1,101 @@
+From 5e5b8ef0c22dfe27479db7211785b660eb48a4f8 Mon Sep 17 00:00:00 2001
+From: Michal Sojka <michal.sojka@cvut.cz>
+Date: Wed, 16 Oct 2024 00:03:34 +0200
+Subject: [PATCH] Work around segfaults in the traffic manager
+
+Backtrace of the mentioned segault looks like this:
+
+    Thread 1 "python3" received signal SIGABRT, Aborted.
+    0x00007ffff75b57dc in __pthread_kill_implementation () from /nix/store/3dyw8dzj9ab4m8hv5dpyx7zii8d0w6fi-glibc-2.39-52/lib/libc.so.6
+    (gdb) bt
+    #0  0x00007ffff75b57dc in __pthread_kill_implementation () from /nix/store/3dyw8dzj9ab4m8hv5dpyx7zii8d0w6fi-glibc-2.39-52/lib/libc.so.6
+    #1  0x00007ffff7563516 in raise () from /nix/store/3dyw8dzj9ab4m8hv5dpyx7zii8d0w6fi-glibc-2.39-52/lib/libc.so.6
+    #2  0x00007ffff754b935 in abort () from /nix/store/3dyw8dzj9ab4m8hv5dpyx7zii8d0w6fi-glibc-2.39-52/lib/libc.so.6
+    #3  0x00007ffff754b859 in __assert_fail_base.cold () from /nix/store/3dyw8dzj9ab4m8hv5dpyx7zii8d0w6fi-glibc-2.39-52/lib/libc.so.6
+    #4  0x00007ffff755b9f6 in __assert_fail () from /nix/store/3dyw8dzj9ab4m8hv5dpyx7zii8d0w6fi-glibc-2.39-52/lib/libc.so.6
+    #5  0x00007fffe90d2bc3 in boost::shared_ptr<carla::client::Waypoint>::operator-> (this=<optimized out>) at include/boost/smart_ptr/shared_ptr.hpp:783
+    #6  0x00007fffe90d2ecc in boost::shared_ptr<carla::client::Waypoint>::operator-> (this=<optimized out>)
+        at /build/source/LibCarla/source/carla/trafficmanager/SimpleWaypoint.cpp:49
+    #7  carla::traffic_manager::SimpleWaypoint::GetLocation (this=<optimized out>) at /build/source/LibCarla/source/carla/trafficmanager/SimpleWaypoint.cpp:48
+    #8  0x00007fffe90c0911 in carla::traffic_manager::InMemoryMap::SetUpSpatialTree (this=0xb4dd80) at /build/source/LibCarla/source/carla/trafficmanager/InMemoryMap.cpp:371
+    #9  0x00007fffe90c132d in carla::traffic_manager::InMemoryMap::Load (this=0xb4dd80, content=...) at /build/source/LibCarla/source/carla/trafficmanager/InMemoryMap.cpp:161
+    #10 0x00007fffe90d6cf4 in carla::traffic_manager::TrafficManagerLocal::SetupLocalMap (this=0xb6ac00)
+        at /nix/store/x8rg4vhgd20i8vzykm1196f9qdb8klhh-gcc-13.3.0/include/c++/13.3.0/bits/shared_ptr_base.h:1665
+    #11 0x00007fffe90daecf in carla::traffic_manager::TrafficManagerLocal::TrafficManagerLocal (this=this@entry=0xb6ac00, longitudinal_PID_parameters=...,
+        longitudinal_highway_PID_parameters=..., lateral_PID_parameters=..., lateral_highway_PID_parameters=..., perc_difference_from_limit=perc_difference_from_limit@entry=0,
+        episode_proxy=..., RPCportTM=@0x7ffffffe1f9c: 8000) at /build/source/LibCarla/source/carla/trafficmanager/TrafficManagerLocal.cpp:106
+    #12 0x00007fffe90d4a00 in carla::traffic_manager::TrafficManager::CreateTrafficManagerServer (this=<optimized out>, episode_proxy=..., port=<optimized out>)
+        at /build/source/LibCarla/source/carla/trafficmanager/TrafficManager.cpp:155
+    #13 0x00007fffe90d5be3 in carla::traffic_manager::TrafficManager::TrafficManager (this=this@entry=0x7ffffffe22ee, episode_proxy=..., port=port@entry=8000)
+        at /build/source/LibCarla/source/carla/trafficmanager/TrafficManager.cpp:40
+    #14 0x00007fffe8dfe5fb in carla::client::Client::GetInstanceTM (port=8000, this=0x7fffe6c51a88)
+        at /nix/store/6d0s1p6f2pa64vkr1vrdqpa54y4shijv-libcarla-client-0.9.15/include/carla/client/Client.h:113
+    #15 operator() (__closure=0x0, t1=8000, self=...) at source/libcarla/Client.cpp:221
+    #16 _FUN () at source/libcarla/Client.cpp:221
+    #17 0x00007fffe8f8da79 in boost::python::detail::invoke<boost::python::to_python_value<carla::traffic_manager::TrafficManager const&>, carla::traffic_manager::TrafficManager (*)(carla::client::Client const&, unsigned short), boost::python::arg_from_python<carla::client::Client const&>, boost::python::arg_from_python<unsigned short> > (rc=...,
+        f=<optimized out>, ac1=..., ac0=...) at include/boost/python/detail/invoke.hpp:73
+    #18 boost::python::detail::caller_arity<2u>::impl<carla::traffic_manager::TrafficManager (*)(carla::client::Client const&, unsigned short), boost::python::default_call_policies, boost::mpl::vector3<carla::traffic_manager::TrafficManager, carla::client::Client const&, unsigned short> >::operator() (args_=<optimized out>, this=<optimized out>)
+        at include/boost/python/detail/caller.hpp:233
+    #19 boost::python::objects::caller_py_function_impl<boost::python::detail::caller<carla::traffic_manager::TrafficManager (*)(carla::client::Client const&, unsigned short), boost::python::default_call_policies, boost::mpl::vector3<carla::traffic_manager::TrafficManager, carla::client::Client const&, unsigned short> > >::operator() (
+        this=<optimized out>, args=<optimized out>, kw=<optimized out>) at include/boost/python/object/py_function.hpp:38
+    #20 0x00007fffe827602e in boost::python::objects::function::call(_object*, _object*) const ()
+       from /nix/store/ylh84bi09anas9gw2hn0h1mbpv3az5m5-boost-1.81.0/lib/libboost_python312.so.1.81.0
+    #21 0x00007fffe82762b8 in boost::detail::function::void_function_ref_invoker0<boost::python::objects::(anonymous namespace)::bind_return, void>::invoke(boost::detail::function::function_buffer&) () from /nix/store/ylh84bi09anas9gw2hn0h1mbpv3az5m5-boost-1.81.0/lib/libboost_python312.so.1.81.0
+    #22 0x00007fffe827b9db in boost::python::detail::exception_handler::operator()(boost::function0<void> const&) const ()
+       from /nix/store/ylh84bi09anas9gw2hn0h1mbpv3az5m5-boost-1.81.0/lib/libboost_python312.so.1.81.0
+    #23 0x00007fffe8eb4e83 in boost::python::detail::translate_exception<rpc::rpc_error, void (*)(rpc::rpc_error const&)>::operator() (this=<optimized out>,
+        translate=0x7fffe8e08000 <translator(rpc::rpc_error const&)>, f=..., handler=...) at include/boost/python/detail/translate_exception.hpp:39
+    #24 boost::_bi::list3<boost::arg<1>, boost::arg<2>, boost::_bi::value<void (*)(rpc::rpc_error const&)> >::operator()<bool, boost::python::detail::translate_exception<rpc::rpc_error, void (*)(rpc::rpc_error const&)>, boost::_bi::rrlist2<boost::python::detail::exception_handler const&, boost::function0<void> const&> > (a=<synthetic pointer>...,
+        f=..., this=<optimized out>) at include/boost/bind/bind.hpp:367
+    #25 boost::_bi::bind_t<bool, boost::python::detail::translate_exception<rpc::rpc_error, void (*)(rpc::rpc_error const&)>, boost::_bi::list3<boost::arg<1>, boost::arg<2>, boost::_bi::value<void (*)(rpc::rpc_error const&)> > >::operator()<boost::python::detail::exception_handler const&, boost::function0<void> const&> (a2=..., a1=...,
+        this=<optimized out>) at include/boost/bind/bind.hpp:1297
+    #26 boost::detail::function::function_obj_invoker2<boost::_bi::bind_t<bool, boost::python::detail::translate_exception<rpc::rpc_error, void (*)(rpc::rpc_error const&)>, boost::_bi::list3<boost::arg<1>, boost::arg<2>, boost::_bi::value<void (*)(rpc::rpc_error const&)> > >, bool, boost::python::detail::exception_handler const&, boost::function0<void> const&>::invoke (function_obj_ptr=..., a0=..., a1=...) at include/boost/function/function_template.hpp:137
+    #27 0x00007fffe827b8ed in boost::python::handle_exception_impl(boost::function0<void>) ()
+       from /nix/store/ylh84bi09anas9gw2hn0h1mbpv3az5m5-boost-1.81.0/lib/libboost_python312.so.1.81.0
+    #28 0x00007fffe8273352 in function_call () from /nix/store/ylh84bi09anas9gw2hn0h1mbpv3az5m5-boost-1.81.0/lib/libboost_python312.so.1.81.0
+    #29 0x00007ffff7a11d31 in _PyObject_MakeTpCall () from /nix/store/j26ma757izikamyjl7cj00r5ic2y0dcn-ros-env/lib/libpython3.12.so.1.0
+    #30 0x00007ffff790bbb5 in _PyEval_EvalFrameDefault () from /nix/store/j26ma757izikamyjl7cj00r5ic2y0dcn-ros-env/lib/libpython3.12.so.1.0
+    #31 0x00007ffff7b6574d in PyEval_EvalCode () from /nix/store/j26ma757izikamyjl7cj00r5ic2y0dcn-ros-env/lib/libpython3.12.so.1.0
+    #32 0x00007ffff7b69d10 in run_eval_code_obj () from /nix/store/j26ma757izikamyjl7cj00r5ic2y0dcn-ros-env/lib/libpython3.12.so.1.0
+    #33 0x00007ffff7bc793d in run_mod () from /nix/store/j26ma757izikamyjl7cj00r5ic2y0dcn-ros-env/lib/libpython3.12.so.1.0
+    #34 0x00007ffff7c00bb5 in _PyRun_SimpleFileObject () from /nix/store/j26ma757izikamyjl7cj00r5ic2y0dcn-ros-env/lib/libpython3.12.so.1.0
+    #35 0x00007ffff7c01911 in _PyRun_AnyFileObject () from /nix/store/j26ma757izikamyjl7cj00r5ic2y0dcn-ros-env/lib/libpython3.12.so.1.0
+    #36 0x00007ffff7c07f7a in Py_RunMain () from /nix/store/j26ma757izikamyjl7cj00r5ic2y0dcn-ros-env/lib/libpython3.12.so.1.0
+    #37 0x00007ffff754d14e in __libc_start_call_main () from /nix/store/3dyw8dzj9ab4m8hv5dpyx7zii8d0w6fi-glibc-2.39-52/lib/libc.so.6
+    #38 0x00007ffff754d209 in __libc_start_main_impl () from /nix/store/3dyw8dzj9ab4m8hv5dpyx7zii8d0w6fi-glibc-2.39-52/lib/libc.so.6
+    #39 0x0000000000401075 in _start ()
+---
+ source/carla/trafficmanager/InMemoryMap.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/source/carla/trafficmanager/InMemoryMap.cpp b/source/carla/trafficmanager/InMemoryMap.cpp
+index a4bc9bea8..7e35dd57d 100644
+--- a/source/carla/trafficmanager/InMemoryMap.cpp
++++ b/source/carla/trafficmanager/InMemoryMap.cpp
+@@ -9,6 +9,7 @@
+ #include "carla/trafficmanager/Constants.h"
+ #include "carla/trafficmanager/InMemoryMap.h"
+ #include <boost/geometry/geometries/box.hpp>
++#include <iostream>
+ 
+ namespace carla {
+ namespace traffic_manager {
+@@ -127,6 +128,15 @@ namespace traffic_manager {
+       id2index.insert({cached_wp.waypoint_id, i});
+ 
+       WaypointPtr waypoint_ptr = _world_map->GetWaypointXODR(cached_wp.road_id, cached_wp.lane_id, cached_wp.s);
++      if (waypoint_ptr == nullptr) {
++        // Work around segfaults in later code. The root cause is
++        // somewhere else (perhaps some memory corruption due to a
++        // race condition), but I don't know where.
++        std::cerr << "warning: Missing waypoint for road_id " << cached_wp.road_id
++                  << " lane_id " << cached_wp.lane_id << ". Ignoring."
++                  << std::endl;
++        continue;
++      }
+       SimpleWaypointPtr wp = std::make_shared<SimpleWaypoint>(waypoint_ptr);
+       wp->SetGeodesicGridId(cached_wp.geodesic_grid_id);
+       wp->SetIsJunction(cached_wp.is_junction);
+-- 
+2.46.0
+
