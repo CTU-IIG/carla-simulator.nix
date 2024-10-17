@@ -92,14 +92,14 @@ python3Packages.buildPythonPackage rec {
 
   installPhase = ''
     mkdir -p $out/${python3.sitePackages}
-    cp -r $src/srunner $out/${python3.sitePackages}
+    cp -r srunner $out/${python3.sitePackages}
 
     mkdir -p $out/bin
-    cp $src/scenario_runner.py $out/bin
-    cp $src/metrics_manager.py $out/bin/scenario_runner_metrics_manager.py
+    cp scenario_runner.py $out/bin
+    cp metrics_manager.py $out/bin/scenario_runner_metrics_manager.py
     chmod +x $out/bin/scenario_runner_metrics_manager.py
-    cp $src/no_rendering_mode.py $out/bin/scenario_runner_no_rendering_mode.py
-    cp $src/manual_control.py $out/bin/scenario_runner_manual_control.py
+    cp no_rendering_mode.py $out/bin/scenario_runner_no_rendering_mode.py
+    cp manual_control.py $out/bin/scenario_runner_manual_control.py
   '';
 
   makeWrapperArgs = [
