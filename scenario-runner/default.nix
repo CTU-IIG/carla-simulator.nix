@@ -4,6 +4,7 @@
 , fetchPypi
 , opencv-python
 , carla-py
+, fetchpatch
 }:
 let
   py-trees = python3Packages.buildPythonPackage rec {
@@ -44,6 +45,20 @@ python3Packages.buildPythonPackage rec {
     rev = "7758d066080f180f8296887ed89b7c723a54706a"; #"v${version}";
     hash = "sha256-lRcq0bI/ZDRugiThH3nSYNvx5Aep76BwPo719LLVPlQ=";
   };
+
+  patches = [
+    (fetchpatch {
+      # Don't depend on distutils
+      url = "https://github.com/carla-simulator/scenario_runner/commit/272eda32a4d6db164b4f74cd9a11e232b35933ad.patch";
+      hash = "sha256-muaPRhpN8YHQEY8bujwKt7MHZ5Ag3Kkl2qf7LedqIsM=";
+    })
+    (fetchpatch {
+      # osc2_scenario: Fix SyntaxWarnings
+      url = "https://github.com/carla-simulator/scenario_runner/commit/cd1a563e6d4b1ba087c3ca7093c1b231ae294565.patch";
+      excludes = [ "Docs/CHANGELOG.md" ];
+      hash = "sha256-0blb34LFP3ctxinniwSwC6TB+swgZ/A8MdemrN5SE44=";
+    })
+  ];
 
   buildInputs = [
     python3
