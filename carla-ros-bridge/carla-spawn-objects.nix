@@ -8,7 +8,7 @@
   ros-compatibility,
   roslaunch,
   rospy,
-  topic-tools,
+  topic-tools, python3Packages,
 }:
 buildRosPackage rec {
   pname = "ros-noetic-carla-spawn-objects";
@@ -26,6 +26,7 @@ buildRosPackage rec {
   buildInputs = [
     catkin
     roslaunch
+    python3Packages.distutils
   ];
   propagatedBuildInputs = [
     carla-msgs

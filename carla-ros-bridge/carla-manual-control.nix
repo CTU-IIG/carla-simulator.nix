@@ -10,7 +10,7 @@
   rospy,
   sensor-msgs,
   std-msgs,
-  tf,
+  tf, python3Packages,
 }:
 buildRosPackage rec {
   pname = "ros-noetic-carla-manual-control";
@@ -28,6 +28,7 @@ buildRosPackage rec {
   buildInputs = [
     catkin
     roslaunch
+    python3Packages.distutils
   ];
   propagatedBuildInputs = [
     carla-msgs

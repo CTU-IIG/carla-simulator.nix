@@ -42,6 +42,7 @@ buildRosPackage rec {
   buildInputs = [
     catkin
     roslaunch
+    python3Packages.distutils
   ];
   propagatedBuildInputs = [
     carla-common

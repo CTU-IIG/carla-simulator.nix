@@ -4,7 +4,7 @@
   buildRosPackage,
   fetchFromGitHub,
   catkin,
-  ros-environment,
+  ros-environment, python3Packages,
 }:
 buildRosPackage rec {
   pname = "ros-noetic-carla-common";
@@ -22,6 +22,7 @@ buildRosPackage rec {
   buildInputs = [
     catkin
     ros-environment
+    python3Packages.distutils
   ];
   nativeBuildInputs = [ catkin ];
 

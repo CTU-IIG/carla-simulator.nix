@@ -5,7 +5,7 @@
   fetchFromGitHub,
   catkin,
   rospy,
-  std-msgs,
+  std-msgs, python3Packages,
 }:
 buildRosPackage rec {
   pname = "ros-noetic-ros-compatibility";
@@ -20,7 +20,10 @@ buildRosPackage rec {
 
   buildType = "catkin";
   sourceRoot = "${src.name}/ros_compatibility/";
-  buildInputs = [ catkin ];
+  buildInputs = [
+    catkin
+    python3Packages.distutils
+  ];
   propagatedBuildInputs = [
     rospy
     std-msgs
