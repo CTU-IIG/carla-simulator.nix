@@ -26,6 +26,7 @@ stdenv.mkDerivation rec {
     # "WARNING: No InMemoryMap cache found. Setting up local map. This may
     # take a while...". The time seems to be short for our maps.
     ./work-around-segfaults-in-the-traffic-manager.patch
+    ./Fixes-for-Boost-1.87-and-GCC-14.patch
   ];
   cmakeFlags = [
     "../cmake"

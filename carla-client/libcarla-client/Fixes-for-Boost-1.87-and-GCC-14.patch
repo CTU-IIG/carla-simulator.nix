@@ -1,0 +1,150 @@
+From b4ae57e27d1a2d9e60d7b2f3d8c01f33fda590fd Mon Sep 17 00:00:00 2001
+From: Michal Sojka <michal.sojka@cvut.cz>
+Date: Wed, 19 Mar 2025 18:01:04 +0100
+Subject: [PATCH] Fixes for Boost 1.87 and GCC 14
+
+---
+ source/carla/FileSystem.cpp          | 1 +
+ source/carla/ThreadPool.h            | 4 ++--
+ source/carla/client/FileTransfer.h   | 1 +
+ source/carla/multigpu/listener.cpp   | 2 +-
+ source/carla/multigpu/router.cpp     | 2 +-
+ source/carla/multigpu/secondary.cpp  | 2 +-
+ source/carla/ros2/ROS2CallbackData.h | 1 +
+ source/carla/rpc/Server.h            | 2 +-
+ source/carla/streaming/EndPoint.h    | 8 +++-----
+ 9 files changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/source/carla/FileSystem.cpp b/source/carla/FileSystem.cpp
+index 1df3462b5..08582c347 100644
+--- a/source/carla/FileSystem.cpp
++++ b/source/carla/FileSystem.cpp
+@@ -10,6 +10,7 @@
+ #include "carla/StringUtil.h"
+ 
+ #include <boost/filesystem/operations.hpp>
++#include <boost/filesystem/directory.hpp>
+ 
+ namespace carla {
+ 
+diff --git a/source/carla/ThreadPool.h b/source/carla/ThreadPool.h
+index b807d4e24..3ab7f07e2 100644
+--- a/source/carla/ThreadPool.h
++++ b/source/carla/ThreadPool.h
+@@ -24,7 +24,7 @@ namespace carla {
+   class ThreadPool : private NonCopyable {
+   public:
+ 
+-    ThreadPool() : _work_to_do(_io_context) {}
++    ThreadPool() : _work_to_do(boost::asio::make_work_guard(_io_context)) {}
+ 
+     /// Stops the ThreadPool and joins all its threads.
+     ~ThreadPool() {
+@@ -82,7 +82,7 @@ namespace carla {
+ 
+     boost::asio::io_context _io_context;
+ 
+-    boost::asio::io_context::work _work_to_do;
++    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> _work_to_do;
+ 
+     ThreadGroup _workers;
+   };
+diff --git a/source/carla/client/FileTransfer.h b/source/carla/client/FileTransfer.h
+index fd1c09162..3397d1ebb 100644
+--- a/source/carla/client/FileTransfer.h
++++ b/source/carla/client/FileTransfer.h
+@@ -8,6 +8,7 @@
+ 
+ #include "carla/FileSystem.h"
+ 
++#include <cstdint>
+ #include <fstream>
+ #include <iostream>
+ #include <string>
+diff --git a/source/carla/multigpu/listener.cpp b/source/carla/multigpu/listener.cpp
+index daa3cc346..7751169bf 100644
+--- a/source/carla/multigpu/listener.cpp
++++ b/source/carla/multigpu/listener.cpp
+@@ -31,7 +31,7 @@ namespace multigpu {
+     _acceptor.cancel();
+     _acceptor.close();
+     _io_context.stop();
+-    _io_context.reset();
++    _io_context.restart();
+   }
+   
+   void Listener::OpenSession(
+diff --git a/source/carla/multigpu/router.cpp b/source/carla/multigpu/router.cpp
+index 6cae3da54..48566b16e 100644
+--- a/source/carla/multigpu/router.cpp
++++ b/source/carla/multigpu/router.cpp
+@@ -29,7 +29,7 @@ void Router::Stop() {
+ Router::Router(uint16_t port) :
+   _next(0) {
+ 
+-  _endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string("0.0.0.0"), port);
++  _endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::make_address("0.0.0.0"), port);
+   _listener = std::make_shared<carla::multigpu::Listener>(_pool.io_context(), _endpoint);
+ }
+ 
+diff --git a/source/carla/multigpu/secondary.cpp b/source/carla/multigpu/secondary.cpp
+index a03dadf46..a142e03fa 100644
+--- a/source/carla/multigpu/secondary.cpp
++++ b/source/carla/multigpu/secondary.cpp
+@@ -48,7 +48,7 @@ namespace multigpu {
+       _connection_timer(_pool.io_context()),
+       _buffer_pool(std::make_shared<BufferPool>()) {
+ 
+-    boost::asio::ip::address ip_address = boost::asio::ip::address::from_string(ip);
++    boost::asio::ip::address ip_address = boost::asio::ip::make_address(ip);
+     _endpoint = boost::asio::ip::tcp::endpoint(ip_address, port);
+     _commander.set_callback(callback);
+   }
+diff --git a/source/carla/ros2/ROS2CallbackData.h b/source/carla/ros2/ROS2CallbackData.h
+index e4370e4c4..8516dba65 100644
+--- a/source/carla/ros2/ROS2CallbackData.h
++++ b/source/carla/ros2/ROS2CallbackData.h
+@@ -15,6 +15,7 @@
+ #else
+ #include <boost/variant2/variant.hpp>
+ #endif
++#include <functional>
+ 
+ namespace carla {
+ namespace ros2 {
+diff --git a/source/carla/rpc/Server.h b/source/carla/rpc/Server.h
+index 69dc6f8c8..25c7d2b3e 100644
+--- a/source/carla/rpc/Server.h
++++ b/source/carla/rpc/Server.h
+@@ -56,7 +56,7 @@ namespace rpc {
+       TRACE_CPUPROFILER_EVENT_SCOPE_STR(__FUNCTION__);
+       #include <compiler/disable-ue4-macros.h>
+       #endif // LIBCARLA_INCLUDED_FROM_UE4
+-      _sync_io_context.reset();
++      _sync_io_context.restart();
+       _sync_io_context.run_for(duration.to_chrono());
+     }
+ 
+diff --git a/source/carla/streaming/EndPoint.h b/source/carla/streaming/EndPoint.h
+index 326a759e8..7f9b02842 100644
+--- a/source/carla/streaming/EndPoint.h
++++ b/source/carla/streaming/EndPoint.h
+@@ -75,12 +75,10 @@ namespace detail {
+   static inline auto make_address(const std::string &address) {
+     boost::asio::io_context io_context;
+     boost::asio::ip::tcp::resolver resolver(io_context);
+-    boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v4(), address, "", boost::asio::ip::tcp::resolver::query::canonical_name);
+-    boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
+-    boost::asio::ip::tcp::resolver::iterator end;
+-    while (iter != end)
++    auto result = resolver.resolve(boost::asio::ip::tcp::v4(), address, "", boost::asio::ip::tcp::resolver::flags::canonical_name);
++
++    for (boost::asio::ip::tcp::endpoint endpoint: result)
+     {
+-      boost::asio::ip::tcp::endpoint endpoint = *iter++;
+       return endpoint.address();
+     }
+     return boost::asio::ip::make_address(address);
+-- 
+2.48.1
+
