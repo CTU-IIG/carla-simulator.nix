@@ -27,18 +27,18 @@ let
 in
 python3Packages.buildPythonPackage rec {
   pname = "opencv-python";
-  version = "4.9.0.80";
+  version = "4.11.0.86";
   format = "pyproject";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-Gp8OYmfeOhodsMVCE9Aix8i1ucpLWA6AvcWFFskiyeE=";
+    hash = "sha256-A9YMyuYjBIYNIyJy5KT9qTw51ZV4DLQLFhsxAkS3NqQ=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace 'setuptools==59.2.0' 'setuptools' \
-      --replace 'numpy==1.22.2' 'numpy'
+      --replace-fail 'setuptools==59.2.0' 'setuptools' \
+      --replace-fail 'setuptools<70.0.0' 'setuptools'
   '';
 
   preConfigure = ''
