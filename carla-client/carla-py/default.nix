@@ -1,5 +1,4 @@
-{ python3Packages
-, python3
+{ python
 , libpng
 , libjpeg
 , libtiff
@@ -11,9 +10,10 @@
 , carla-src
 , lib
 , enableDebug ? false
-}:
+, buildPythonPackage
+, boost, distro, networkx, shapely, numpy}:
 
-python3Packages.buildPythonPackage rec {
+buildPythonPackage rec {
   pname = "carla-py";
   version = carla-src.meta.version;
 
@@ -34,21 +34,21 @@ python3Packages.buildPythonPackage rec {
     libtiff.dev
     osm2odr
     proj.dev
-    python3Packages.boost
-    python3Packages.distro
-    python3Packages.networkx
-    python3Packages.shapely
+    boost
+    distro
+    networkx
+    shapely
     sqlite.dev
     xercesc
   ];
 
   propagatedBuildInputs = [
-    python3Packages.numpy
-    python3Packages.shapely
+    numpy
+    shapely
   ];
 
   postInstall = ''
-    cp -r $src/PythonAPI/carla/agents $out/${python3.sitePackages}
+    cp -r $src/PythonAPI/carla/agents $out/${python.sitePackages}
   '';
 
   patches = if lib.versionOlder version "0.9.15" then [

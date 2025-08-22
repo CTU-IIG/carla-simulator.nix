@@ -1,13 +1,27 @@
-{ python3Packages
-, python3
+{ buildPythonPackage
+, python
 , fetchFromGitHub
 , fetchPypi
-, opencv-python
 , carla-py
 , fetchpatch
+, networkx #==2.2
+, shapely# ==1.7.1
+, psutil
+, xmlschema #==1.0.18
+, ephem
+, tabulate
+, opencv-python #==4.2.0.32
+, numpy
+, matplotlib
+, six
+, graphviz
+, antlr4-python3-runtime
+# for manual_control.py
+, pygame
+, pydot
 }:
 let
-  py-trees = python3Packages.buildPythonPackage rec {
+  py-trees = buildPythonPackage rec {
     pname = "py_trees";
     version = "0.8.3";
     format = "setuptools";
@@ -17,13 +31,13 @@ let
       hash = "sha256-Z54MItiFR1kYCpxPQ/jEyHR51TFCBolKIw91hpyCLJE=";
     };
 
-    propagatedBuildInputs = with python3Packages; [
+    propagatedBuildInputs = [
       pydot
     ];
 
     doCheck = false; # nose-htmloutput is not in nixpkgs
   };
-  simple-watchdog-timer = python3Packages.buildPythonPackage rec {
+  simple-watchdog-timer = buildPythonPackage rec {
     pname = "simple_watchdog_timer";
     version = "0.1.1";
     format = "setuptools";
@@ -34,7 +48,7 @@ let
     };
   };
 in
-python3Packages.buildPythonPackage rec {
+buildPythonPackage rec {
   pname = "scenario-runner";
   version = "0.9.15+dev";
   format = "other";
@@ -61,10 +75,10 @@ python3Packages.buildPythonPackage rec {
   ];
 
   buildInputs = [
-    python3
+    python
   ];
 
-  propagatedBuildInputs = (with python3Packages; [
+  propagatedBuildInputs = [
     # From requirements.txt
     py-trees #==0.8.3
     networkx #==2.2
@@ -83,7 +97,7 @@ python3Packages.buildPythonPackage rec {
 
     # for manual_control.py
     pygame
-  ]) ++ [
+
     # Other
     carla-py
   ];
@@ -91,8 +105,8 @@ python3Packages.buildPythonPackage rec {
   dontBuild = true;
 
   installPhase = ''
-    mkdir -p $out/${python3.sitePackages}
-    cp -r srunner $out/${python3.sitePackages}
+    mkdir -p $out/${python.sitePackages}
+    cp -r srunner $out/${python.sitePackages}
 
     mkdir -p $out/bin
     cp scenario_runner.py $out/bin
@@ -103,8 +117,8 @@ python3Packages.buildPythonPackage rec {
   '';
 
   makeWrapperArgs = [
-    "--prefix PYTHONPATH : ''$out/${python3.sitePackages}"
-    "--set-default SCENARIO_RUNNER_ROOT $out/${python3.sitePackages}"
+    "--prefix PYTHONPATH : ''$out/${python.sitePackages}"
+    "--set-default SCENARIO_RUNNER_ROOT $out/${python.sitePackages}"
   ] ++ (let
     # This must be defined here due to nix escaping rules
     carla-host-arg = ''''${CARLA_HOST:+--host $CARLA_HOST}'';

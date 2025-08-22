@@ -1,10 +1,10 @@
 { lib, stdenv, writeScript, fetchurl, requireFile, unzip, mono, which,
-  xorg, xdg-user-dirs, zlib, udev, runCommand, buildFHSUserEnv, autoPatchelfHook,
-  lzma,
+  xorg, xdg-user-dirs, zlib, udev, runCommand, buildFHSEnv, autoPatchelfHook,
+  xz,
 
   alsa-lib, atk, bzip2, cairo, dbus, expat, fontconfig, freetype,
-  gnome2, gdbm, libglvnd, glib, ncurses5, nspr, nss_latest, readline,
-  sqlite, tcl-8_5, tk-8_5, libuuid
+  pango, gdbm, libglvnd, glib, ncurses5, nspr, nss_latest, readline,
+  sqlite, tcl-8_5, tk-8_5, libuuid, gnome2
 }:
 
 let
@@ -107,7 +107,7 @@ let
   # without any sort of patching. Resulting binaries may not work on
   # NixOS without wrapping them in FHS though.
   runInFHSUserEnv = drv: envArgs: let
-    fhsWrapper = buildFHSUserEnv ({
+    fhsWrapper = buildFHSEnv ({
       name = "${drv.name}-fhs-wrapper";
       runScript = "$@";
     } // envArgs);
@@ -138,9 +138,9 @@ stdenv.mkDerivation rec {
     "usdSchemaExamples.so"
   ];
 
-  buildInputs = [ zlib lzma alsa-lib atk bzip2 cairo dbus expat
+  buildInputs = [ zlib xz alsa-lib atk bzip2 cairo dbus expat
     fontconfig freetype gnome2.GConf gdbm libglvnd glib ncurses5 nspr
-    nss_latest gnome2.pango readline sqlite tcl-8_5 tk-8_5 libuuid
+    nss_latest pango readline sqlite tcl-8_5 tk-8_5 libuuid
 
     xorg.libX11 xorg.libXScrnSaver xorg.libXau xorg.libXcursor xorg.libXext
     xorg.libXfixes xorg.libXi xorg.libXrandr xorg.libXrender xorg.libXxf86vm

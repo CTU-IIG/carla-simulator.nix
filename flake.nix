@@ -25,7 +25,7 @@
           rpclib = prev.callPackage carla-client/rpclib.nix {};
           opencv-python = prev.callPackage ./opencv-python {};
           scenic = prev.callPackage ./scenic {};
-          scenario-runner = prev.callPackage ./scenario-runner {};
+          scenario-runner = final.python3Packages.callPackage ./scenario-runner {};
         };
       in
         genAttrs allVersions (v: overlayForVersion v);
