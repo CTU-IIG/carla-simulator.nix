@@ -59,23 +59,23 @@ with pkgs;
     sysroot = pkgs.buildEnv {
       name = "carla-sysroot";
       paths = [
-        pkgs.llvmPackages_12.libcxx
-        pkgs.llvmPackages_12.libcxx.dev
-        #pkgs.llvmPackages_12.libcxxabi
-        #pkgs.llvmPackages_12.libcxxabi.dev
-        pkgs.llvmPackages_12.compiler-rt
-        #pkgs.llvmPackages_12.compiler-rt.dev
+        pkgs.llvmPackages_18.libcxx
+        pkgs.llvmPackages_18.libcxx.dev
+        #pkgs.llvmPackages_18.libcxxabi
+        #pkgs.llvmPackages_18.libcxxabi.dev
+        pkgs.llvmPackages_18.compiler-rt
+        #pkgs.llvmPackages_18.compiler-rt.dev
       ];
     };
   in ''
     export UE4_ROOT=~/src/carla/nix/build-env/UnrealEngine_4.26
     cd ~/src/carla/carla
-    # sed -i -e s,\$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu,${pkgs.llvmPackages_12.clang}, \
+    # sed -i -e s,\$UE4_ROOT/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/v17_clang-10.0.1-centos7/x86_64-unknown-linux-gnu,${pkgs.llvmPackages_18.clang}, \
     #   Util/BuildTools/*.sh
 
-    export CC="${pkgs.llvmPackages_12.clang}/bin/clang"
-    export CXX="${pkgs.llvmPackages_12.clang}/bin/clang++"
-    export PATH="${pkgs.llvmPackages_12.clang}/bin:$PATH"
+    export CC="${pkgs.llvmPackages_18.clang}/bin/clang"
+    export CXX="${pkgs.llvmPackages_18.clang}/bin/clang++"
+    export PATH="${pkgs.llvmPackages_18.clang}/bin:$PATH"
 
     export LLVM_INCLUDE=${sysroot}/include/c++/v1
     export LLVM_LIBPATH=${sysroot}/lib
