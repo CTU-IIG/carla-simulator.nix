@@ -23,5 +23,6 @@ stdenv.mkDerivation {
   cmakeFlags = [
     "-DRECASTNAVIGATION_DEMO=False"
     "-DRECASTNAVIGATION_TEST=False"
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
   ];
 }

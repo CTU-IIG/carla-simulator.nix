@@ -11,7 +11,9 @@
 , lib
 , enableDebug ? false
 , buildPythonPackage
-, boost, distro, networkx, shapely, numpy}:
+, boost, distro, networkx, shapely, numpy
+, setuptools
+}:
 
 buildPythonPackage rec {
   pname = "carla-py";
@@ -22,10 +24,14 @@ buildPythonPackage rec {
 #   src = /home/wsh/src/carla/carla;
 #   sourceRoot = "carla/PythonAPI/carla";
 
+  __structuredAttrs = true;
   separateDebugInfo = !enableDebug;
   # sepaseparateDebugInfo is not sufficient to get debug info in
   # backtraces. Not sure why.
   dontStrip = enableDebug;
+
+  pyproject = true;
+  build-system = [ setuptools ];
 
   buildInputs = [
     (libcarla-client.override { inherit enableDebug; })
