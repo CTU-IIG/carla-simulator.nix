@@ -14,7 +14,14 @@
 , stdenv
 , systemd
 , vulkan-loader
-, xorg
+, libx11
+, libxscrnsaver
+, libxcursor
+, libxext
+, libxi
+, libxinerama
+, libxrandr
+, libxxf86vm
 , zlib
 , symlinkJoin
 , unzip
@@ -25,14 +32,14 @@ let
     libglvnd
     libxkbcommon
     systemd                     # for libudev
-    xorg.libX11
-    xorg.libXScrnSaver
-    xorg.libXcursor
-    xorg.libXext
-    xorg.libXi
-    xorg.libXinerama
-    xorg.libXrandr
-    xorg.libXxf86vm
+    libx11
+    libxscrnsaver
+    libxcursor
+    libxext
+    libxi
+    libxinerama
+    libxrandr
+    libxxf86vm
     vulkan-loader
   ];
   # Use our own wrapper in $out/bin/ instead of the original CarlaUE4.sh in $out/

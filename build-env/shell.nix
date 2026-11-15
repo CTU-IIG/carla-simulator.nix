@@ -47,9 +47,9 @@ with pkgs;
     #mono
     zlib
 
-    xorg.libX11 xorg.libXScrnSaver xorg.libXau xorg.libXcursor xorg.libXext
-    xorg.libXfixes xorg.libXi xorg.libXrandr xorg.libXrender xorg.libXxf86vm
-    xorg.libxcb
+    libx11 libxscrnsaver libxau libxcursor libxext
+    libxfixes libxi libxrandr libxrender libxxf86vm
+    libxcb
 
     udev
     vulkan-loader

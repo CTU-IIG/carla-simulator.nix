@@ -3,7 +3,7 @@
 , xercesc
 , zlib
 , proj
-, xorg
+, libx11
 , fetchFromGitHub
 }:
 
@@ -19,6 +19,6 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ xercesc zlib.dev proj.dev xorg.libX11.dev ];
+  buildInputs = [ xercesc zlib.dev proj.dev libx11.dev ];
   cmakeFlags = [ "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ];
 }

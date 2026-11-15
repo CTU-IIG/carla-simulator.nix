@@ -1,5 +1,7 @@
 { lib, stdenv, writeScript, fetchurl, requireFile, unzip, mono, which,
-  xorg, xdg-user-dirs, zlib, udev, runCommand, buildFHSEnv, autoPatchelfHook,
+  libx11, libxscrnsaver, libxau, libxcursor, libxext, libxfixes, libxi,
+  libxrandr, libxrender, libxxf86vm, libxcb, libxcomposite, libxdamage, libxtst,
+  lndir, xdg-user-dirs, zlib, udev, runCommand, buildFHSEnv, autoPatchelfHook,
   xz,
 
   alsa-lib, atk, bzip2, cairo, dbus, expat, fontconfig, freetype,
@@ -22,9 +24,9 @@ let
     ${linkDeps}
   '';
   libPath = lib.makeLibraryPath [
-    xorg.libX11 xorg.libXScrnSaver xorg.libXau xorg.libXcursor xorg.libXext
-    xorg.libXfixes xorg.libXi xorg.libXrandr xorg.libXrender xorg.libXxf86vm
-    xorg.libxcb
+    libx11 libxscrnsaver libxau libxcursor libxext
+    libxfixes libxi libxrandr libxrender libxxf86vm
+    libxcb
   ];
 
   # Values from Engine/Build/BatchFiles/Linux/SetupToolchain.sh
@@ -142,9 +144,9 @@ stdenv.mkDerivation rec {
     fontconfig freetype gnome2.GConf gdbm libglvnd glib ncurses5 nspr
     nss_latest pango readline sqlite tcl-8_5 tk-8_5 libuuid
 
-    xorg.libX11 xorg.libXScrnSaver xorg.libXau xorg.libXcursor xorg.libXext
-    xorg.libXfixes xorg.libXi xorg.libXrandr xorg.libXrender xorg.libXxf86vm
-    xorg.libxcb xorg.libXcomposite xorg.libXdamage xorg.libXtst
+    libx11 libxscrnsaver libxau libxcursor libxext
+    libxfixes libxi libxrandr libxrender libxxf86vm
+    libxcb libxcomposite libxdamage libxtst
   ];
 
   installPhase = ''
@@ -168,7 +170,7 @@ stdenv.mkDerivation rec {
       workdir="\$HOME/.config/unreal-engine-nix-workdir"
       if [ ! -e "\$workdir" ]; then
         mkdir -p "\$workdir"
-        ${xorg.lndir}/bin/lndir "\$sharedir" "\$workdir"
+        ${lndir}/bin/lndir "\$sharedir" "\$workdir"
         unlink "\$workdir/Engine/Binaries/Linux/UE4Editor"
         cp "\$sharedir/Engine/Binaries/Linux/UE4Editor" "\$workdir/Engine/Binaries/Linux/UE4Editor"
       fi
